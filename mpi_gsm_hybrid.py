@@ -32,11 +32,8 @@ num_slaves = size-1
 scripts_loc = '/global/homes/m/mpresley/scripts'
 #scripts_loc = '/Users/mpresley/soft/capo/mep/nersc_scripts/scripts'
 
-# get system arguments
-_,fq,del_bl,num_bl = sys.argv
-fq=float(fq),del_bl=float(del_bl);num_bl=int(num_bl)
-
 # define parameters related to calculation
+fq = 0.1
 healmap = a.map.Map(fromfits='{0}/general_files/fits_files/hi1001_32.fits'.format(scripts_loc))
 global px_array; px_array = n.arange(healmap.npix()) # gets an array of healpix pixel indices
 global crd_array; crd_array = n.array(healmap.px2crd(px_array,ncrd=3)) # finds the topocentric coords for each healpix pixel
@@ -46,11 +43,14 @@ phi,theta = n.array(healmap.px2crd(px_array,ncrd=2))
 #print 'theta max = ',max(theta)
 #print 'phi max = ',max(phi)
 
+_,del_bl,num_bl = sys.argv
+del_bl=float(del_bl);num_bl=int(num_bl)
+
 beamsig_largebm = 10/(2*n.pi*del_bl*(num_bl-1)) #1.0                                         
 beamsig_smallbm = 10/(2*n.pi*del_bl) #0.25          
 smallbm_inds = (int(n.floor(num_bl/2)),int(n.floor(num_bl/2)))
 
-savekey = 'hybrid_fq_{0:.2f}_del_bl_{1:.2f}_num_bl_{2}'.format(fq,del_bl,num_bl)
+savekey = 'hybrid_del_bl_{0:.2f}_num_bl_{1}'.format(del_bl,num_bl)
 
 amp_largebm = uf.gaussian(beamsig_largebm,n.zeros_like(theta),phi)
 amp_smallbm = uf.gaussian(beamsig_smallbm,n.zeros_like(theta),phi)
