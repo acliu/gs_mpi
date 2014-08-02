@@ -1,7 +1,6 @@
 from mpi4py import MPI 
 import sys
 import aipy as a, numpy as n
-import capo as C
 import useful_functions as uf
 from scipy import special
 import basic_amp_aa_grid_gauss as agg
@@ -46,8 +45,8 @@ master = 0
 num_slaves = size-1
 
 # define scripts directory location
-#scripts_loc = '/global/homes/m/mpresley/scripts'
-scripts_loc = '/Users/mpresley/soft/capo/mep/nersc_scripts/scripts'
+#save_loc = '/global/scratch2/sd/mpresley/gs_data'
+save_loc = '/Users/mpresley/Research/Research_Adrian_Aaron/gs_data'
 
 # define parameters related to calculation 
 maxl = 10
