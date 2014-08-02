@@ -13,7 +13,7 @@ def get_single_Q_element(im,(tx,ty,tz),dOmega,amp,baseline,l,m):
     phi = n.arccos(n.sqrt(1-tx*tx-ty*ty))
     Y = n.array(special.sph_harm(m,l,theta,phi)) #using math convention of theta=[0,2pi], phi=[0,pi]    
     #fringe pattern
-    phs = n.exp(-2j*n.pi*fq * (bx*tx+by*ty+bz*tz)) 
+    phs = n.exp(-2j*n.pi*fq * (bx*tx+by*ty+bz*tz)) # bl in ns, fq in GHz => bl*fq = 1
     # not sure if I actually need this stuff
     tx.shape = im.uv.shape
     valid = n.logical_not(tx.mask)
@@ -144,7 +144,7 @@ elif rank<=numToDo:
 comm.Barrier()
 
 if rank==master:
-    n.savez_compressed('{0}/Q_matrices/Q_{1}'.format(scripts_loc,savekey),Q=matrix,baselines=baselines,lms=lms)
+    n.savez_compressed('{0}/Q_matrices/Q_{1}'.format(save_loc,savekey),Q=matrix,baselines=baselines,lms=lms)
     print "The master has saved the matrix."
 
 MPI.Finalize()
