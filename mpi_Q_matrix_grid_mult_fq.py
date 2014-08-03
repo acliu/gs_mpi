@@ -1,7 +1,6 @@
 from mpi4py import MPI 
 import sys
 import aipy as a, numpy as n
-import capo as C
 import useful_functions as uf
 from scipy import special
 import basic_amp_aa_grid_gauss as agg

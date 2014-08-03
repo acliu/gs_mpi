@@ -38,6 +38,8 @@ def get_dOmega(tx,ty):
     dOmega = dx*dy/n.sqrt(1-tx*tx-ty*ty)
     return dOmega
 
+print "everything has imported"
+
 # define mpi parameters
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank() #int associated with each processor. ranges from 0 to number of processors
