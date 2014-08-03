@@ -38,6 +38,8 @@ def get_dOmega(tx,ty):
     dOmega = dx*dy/n.sqrt(1-tx*tx-ty*ty)
     return dOmega
 
+print "everything has imported"
+
 # define mpi parameters
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank() #int associated with each processor. ranges from 0 to number of processors
@@ -81,7 +83,7 @@ matrix = n.zeros([num0,num1,len(fqs)],dtype=n.complex)
 assignment_matrix = n.arange(num0*num1).reshape((num0,num1))
 
 # define parameters related to task-mastering
-numToDo = 20 #num0*num1
+numToDo = num0*num1
 print "numToDo = ",numToDo
 num_sent = 0 # this functions both as a record of how many assignments have 
              # been sent and as a tag marking which matrix entry was calculated
