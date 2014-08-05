@@ -8,17 +8,6 @@ import basic_amp_aa_grid_gauss as agg
 
 print "Everything imported!"
 
-def compute_element_old(bli,blj,amp):
-    bix,biy,biz = bli; bjx,bjy,bjz = blj
-    element = 0
-    for kk in px_array:
-        rx,ry,rz = crd_array[:,kk]          
-        Gik = amp[kk]*n.exp(-2j*n.pi*fq*(bix*rx+biy*ry+biz*rz))*dOmega
-        Gjk_star = n.conj(amp[kk]*n.exp(-2j*n.pi*fq*(bjx*rx+bjy*ry+bjz*rz)))*dOmega
-        Rkk = Rdata[kk]*Rdata[kk]
-        element += Gik*Rkk*Gjk_star
-    return element
-
 def compute_element(bli,blj,amp):
     bix,biy,biz = bli; bjx,bjy,bjz = blj
     rx,ry,rz = crd_array
@@ -26,6 +15,16 @@ def compute_element(bli,blj,amp):
     Gj_star = n.conj(amp*n.exp(-2j*n.pi*fq*(bjx*rx+bjy*ry+bjz*rz)))*dOmega
     element = n.sum(Gi*Gj_star*Rsq)
     return element
+
+def compute_element_mult_fqs(bli,blj,amp):
+    bix,biy,biz = bli; bjx,bjy,bjz = blj
+    rx,ry,rz = crd_array
+    fqs_grid, rb_grid = n.meshgrid((bix*rx+biy*ry+biz*rz),fqs)
+    Gi = amp*n.exp(-2j*n.pi*fqs_grid*rb_grid)*dOmega
+    fqs_grid, rb_grid = n.meshgrid((bjx*rx+bjy*ry+bjz*rz),fqs)
+    Gj_star = n.conj(amp*n.exp(-2j*n.pi*fqs_grid*rb_grid))*dOmega
+    elements = uf.vdot(Gi*Gj_star,Rsq)
+    return elements
 
 # define mpi parameters
 comm = MPI.COMM_WORLD
@@ -41,7 +40,7 @@ fits_file_loc = '/global/homes/m/mpresley/scripts/general_files/fits_files/hi100
 save_loc = '/global/scratch2/sd/mpresley/gs_data'
 
 # define parameters related to calculation
-fqs = n.arange(50,91,2)
+fqs = n.arange(50,91,2)*0.001
 healmap = a.map.Map(fromfits=fits_file_loc)
 global px_array; px_array = n.arange(healmap.npix()) # gets an array of healpix pixel indices
 global crd_array; crd_array = n.array(healmap.px2crd(px_array,ncrd=3)) # finds the topocentric coords for each healpix pixel
@@ -64,7 +63,7 @@ print "defined calculation parameters"
 
 # define matrix to be calculated
 num = len(baselines)
-matrix = n.zeros([num,num],dtype=n.complex)
+matrix = n.zeros([num,num,len(fqs)],dtype=n.complex)
 # define parameters related to task-mastering
 numToDo = num*(num+1)/2
 print 'numToDo = ',numToDo
@@ -74,7 +73,6 @@ for ii in range(num+1):
         assn_inds.append((ii,jj))
 num_sent = 0 # this functions both as a record of how many assignments have 
             # been sent and as a tag marking which matrix entry was calculated
-num_complete = 0
 print "just before the big if statement"
 
 # Big running loop
@@ -96,11 +94,10 @@ if rank==master:
         selectedi = comm.recv(source=source)
         selectedj = comm.recv(source=source)
         # stick entry into matrix 
-        matrix[selectedi,selectedj] = entry
-        matrix[selectedj,selectedi] = n.conj(entry)
+        matrix[selectedi,selectedj,:] = entry
+        matrix[selectedj,selectedi,:] = n.conj(entry)
         print 'Master just received element (i,j) = ',selectedi,selectedj,' from slave ',source
-        num_complete += 1
-        print 'num complete = ',num_complete
+        print 'Have completed {0} of {1}'.format(kk,numToDo)
         # if there are more things to do, send out another assignment
         if num_sent<numToDo:
             selectedi, selectedj = assn_inds[kk]
@@ -130,7 +127,7 @@ elif rank<=numToDo:
             # compute the matrix element
             bli = baselines[selectedi,:]
             blj = baselines[selectedj,:]
-            element = compute_element(bli,blj,amp)
+            element = compute_element_mult_fqs(bli,blj,amp)
             # send answer back
             comm.send((rank,element),dest=master)
             comm.send(selectedi,dest=master)
@@ -139,8 +136,9 @@ elif rank<=numToDo:
 comm.Barrier()
 
 if rank==master:
-    print "The master will now save the matrix."
-    n.savez_compressed('{0}/gsm_matrices/gsm_{1}'.format(save_loc,savekey),matrix=matrix,baselines=baselines)
+    for ii,fq in enumerate(fqs):
+        n.savez_compressed('{0}/gsm_matrices/Q_{1}_fq_{2:.3f}'.format(save_loc,savekey,fq),matrix=matrix[:,:,ii],baselines=baselines)
+    print "The master has saved the matrix."
 
 MPI.Finalize()
 
