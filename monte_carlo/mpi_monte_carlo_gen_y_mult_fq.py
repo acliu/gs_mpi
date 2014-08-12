@@ -21,7 +21,7 @@ def haslam_extrap(hasdat=None,fqs=n.array([0.1,])):
     # fqdat = n.zeros(len(fqs),hasdat.shape[0])
     # for ii,fq in enumerate(fqs):
     #     fqdat[ii,:] = hasdat*(fq/0.408)**(alf-alf0) 
-    fq_grid,hasdat_grid = n.meshgrid(hasdat,fqs) # fq varies on columns, hasdat is in the rows
+    hasdat_grid,fq_grid = n.meshgrid(hasdat,fqs) # fq varies on columns, hasdat is in the rows
     fqdat = hasdat_grid*(fq_grid/0.408)**(alf-alf0) 
     return fqdat
 
@@ -41,6 +41,7 @@ def generate_sky_model_y(baselines,beam_sig,gsm_map=None,gsm_data_file=None):
     rx,ry,rz = n.array(healmap.px2crd(px_array,ncrd=3)) # finds the topocentric coords for each healpix pixel
     phi,theta = n.array(healmap.px2crd(px_array,ncrd=2)) # phi,theta in math coords
     true_sky = healmap.map.map
+    print true_sky
     amp = uf.gaussian(beam_sig,n.zeros_like(theta),phi)
     dOmega = 4*n.pi/px_array.shape[0]
 
@@ -66,12 +67,13 @@ num_slaves = size-1
 print "defined mpi params"
 
 # define monte_carlo directory location
-mc_loc = '/global/homes/m/mpresley/scripts/monte_carlo/matrices'
-#mc_loc = '/Users/mpresley/soft/capo/mep/nersc_scripts/scripts/monte_carlo/matrices'
+#mc_loc = '/global/homes/m/mpresley/scripts/monte_carlo/matrices'
+#mc_loc = '/Users/mpresley/soft/capo/mep/nersc_scripts/scripts/monte_carlo/'
+mc_loc = '/Users/mpresley/Desktop'
 
 # define parameters related to calculation 
-#hasmap = a.map.Map(fromfits='/Users/mpresley/soft/gsm/haslam408_32.fits')
-hasmap = a.map.Map(fromfits='/global/homes/m/mpresley/scripts/general_files/fits_files/haslam408_32.fits')
+hasmap = a.map.Map(fromfits='/Users/mpresley/soft/gsm/haslam408_32.fits')
+#hasmap = a.map.Map(fromfits='/global/homes/m/mpresley/scripts/general_files/fits_files/haslam408_32.fits')
 
 #fqs = n.array([50.,60.,70.])*0.001
 fqs = n.arange(50,91,2)*0.001
