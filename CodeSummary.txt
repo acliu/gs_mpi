@@ -1,0 +1,62 @@
+  ____        _         
+ |  _ \  __ _| |_ __ _  
+ | | | |/ _` | __/ _` | 
+ | |_| | (_| | || (_| | 
+ |____/ \__,_|\__\__,_| 
+                        
+The data-generation codes are all in the folder gs_mpi.
+
+gs_mpi/mpi_gsm_grid_mult_fq_2.py 
+	> calculates N_fg from a set of baselines that form a grid on the uv plane. In the calculation, the image space covariance is assumed to be diagonal. 
+	> The parameters del_bl (the spacing in the uv plane) and beam_sig (the angular width of the beam in radians) and num_bl (the number of baselines on each side of the grid) are system arguments. 
+	> The range of frequencies are hard-wired into the code, as well as the location where the data files should be stored. 
+	> requires the files in gs_mpi/general_files to run.
+
+gs_mpi/mpi_Q_grid_mult_fq_2.py 
+	> the equivalent of mpi_gsm_grid_mult_fq_2.py, only for calculating the Q matrix of the array. 
+
+gs_mpi/run_files/make_many_sub_files_grid.py 
+	> creates and submits a bunch of nersc jobs for either mpi_gsm_grid_mult_fq_2 or mpi_Q_grid_mult_fq_2, or both 
+	> loops over del_bl and beam_sig. 
+
+gs_mpi/monte_carlo/mpi_monte_carlo_gen_y_mult_fq.py
+	> generates a bunch of visibilities from different perturbations of a power law extrapolation of the haslam 408 sky model. 
+	> currently does NOT save the maps used to generate the visibilities
+	> imputs the number of mc runs to do and the interval between saves (note: it does NOT retain data after a save) as well as the grid parameters del_bl, num_bl, and beam_sig.
+
+gs_mpi/monte_carlo/run_files/make_many_sub_files_mc.py
+	> creates and submits a bunch of nersc jobs for mpi_monte_carlo_gen_y_mult_fq
+
+  _  _     _        
+ | \| |___| |_ ___  
+ | .` / _ \  _/ -_) 
+ |_|\_\___/\__\___| 
+ The format of the file names that I'm using for the data generated in the above codes are assumed for the input to the analysis codes below. 
+
+     _                _           _      
+    / \   _ __   __ _| |_   _ ___(_)___  
+   / _ \ | '_ \ / _` | | | | / __| / __| 
+  / ___ \| | | | (_| | | |_| \__ \ \__ \ 
+ /_/   \_\_| |_|\__,_|_|\__, |___/_|___/ 
+                        |___/            
+
+The data-analysis codes are all in the folder capo/mep. These are a lot more complicated, and things tend to break all over the place if healpy isn't installed. The important ones are global_sky_model.py, Q_gsm_error_analysis.py, monte_carlo_analysis.py, and fisher_matrix.py.
+
+mep/global_sky_model.py
+	> contains functions that deal with healpix maps of the gsm, converting to and from fits files, degrading the resolution of maps, and contains preliminary functions for calculating Nfg. 
+
+mep/Q_gsm_error_analysis.py
+	> This file contains lots of functions related to plotting and testing the Q and Nfg matrices, their window functions, info matrices, etc. 
+
+mep/monte_carlo_analysis.py 
+	> contains functions to load Q, Nfg, and mc data
+	> plot_spectrum() generates plots of the mean and std dev of the ahat00 values recovered from the visibilities generated in the mc simulations. 
+	> contruct_covar() generates a N_freq x N_freq covariance matrix based on the recovered ahat00 values. 
+	> construct_gs_hist() generates a histogram plot of the ahat00 values for a given array and frequency. 
+
+mep/fisher_matrix.py
+	> plot_pairwise_contours() ... what can I say? It does exactly what it says. And all of the other functions are really just support functions. 
+
+
+
+
