@@ -67,23 +67,24 @@ num_slaves = size-1
 print "defined mpi params"
 
 # define monte_carlo directory location
-#mc_loc = '/global/homes/m/mpresley/scripts/monte_carlo/matrices'
+mc_loc = '/global/scratch2/sd/mpresley/gs_data/monte_carlo/'
+#mc_loc = '/global/homes/m/mpresley/gs_data/monte_carlo'
 #mc_loc = '/Users/mpresley/soft/capo/mep/nersc_scripts/scripts/monte_carlo/'
-mc_loc = '/Users/mpresley/Desktop'
+#mc_loc = '/Users/mpresley/Desktop'
 
 # define parameters related to calculation 
-hasmap = a.map.Map(fromfits='/Users/mpresley/soft/gsm/haslam408_32.fits')
-#hasmap = a.map.Map(fromfits='/global/homes/m/mpresley/scripts/general_files/fits_files/haslam408_32.fits')
+#hasmap = a.map.Map(fromfits='/Users/mpresley/soft/gsm/haslam408_32.fits')
+hasmap = a.map.Map(fromfits='/global/homes/m/mpresley/scripts/general_files/fits_files/haslam408_32.fits')
 
 #fqs = n.array([50.,60.,70.])*0.001
 fqs = n.arange(50,91,2)*0.001
 print 'fqs ',fqs  
 
-_,num0,beam_sig,del_bl,num_bl = sys.argv
-num0=int(num0);beam_sig=float(beam_sig); del_bl=float(del_bl); num_bl=int(num_bl)
+_,num0,save_interval,beam_sig,del_bl,num_bl = sys.argv
+num0=int(num0);save_interval=int(save_interval);beam_sig=float(beam_sig); del_bl=float(del_bl); num_bl=int(num_bl)
 baselines = agg.make_pos_array(del_bl,num_bl)
 
-save_interval = 10000
+#save_interval = 10000
 save_num = 0
 savekey = 'grid_del_bl_{0:.2f}_num_bl_{1}_beam_sig_{2:.2f}'.format(del_bl,num_bl,beam_sig)
 
