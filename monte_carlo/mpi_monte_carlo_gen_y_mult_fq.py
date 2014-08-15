@@ -41,7 +41,6 @@ def generate_sky_model_y(baselines,beam_sig,gsm_map=None,gsm_data_file=None):
     rx,ry,rz = n.array(healmap.px2crd(px_array,ncrd=3)) # finds the topocentric coords for each healpix pixel
     phi,theta = n.array(healmap.px2crd(px_array,ncrd=2)) # phi,theta in math coords
     true_sky = healmap.map.map
-    print true_sky
     amp = uf.gaussian(beam_sig,n.zeros_like(theta),phi)
     dOmega = 4*n.pi/px_array.shape[0]
 
@@ -68,7 +67,6 @@ print "defined mpi params"
 
 # define monte_carlo directory location
 mc_loc = '/global/scratch2/sd/mpresley/gs_data/monte_carlo'
-#mc_loc = '/Users/mpresley/soft/capo/mep/nersc_scripts/scripts/monte_carlo/'
 #mc_loc = '/Users/mpresley/Desktop'
 
 # define parameters related to calculation 
@@ -104,14 +102,14 @@ print "defined task-mastering stuff"
 if rank==master:
     print "I am the master! Muahaha!"
     for fq in fqs:
-        if '{0}_fq+{1}'.format(savekey,fq) not in os.listdir(mc_loc):
-            os.mkdir('{0}/{1}_fq_{2}'.format(mc_loc,savekey,fq))
+        if '{0}_fq_{1:.3f}'.format(savekey,fq) not in os.listdir(mc_loc):
+            os.mkdir('{0}/{1}_fq_{2:.3f}'.format(mc_loc,savekey,fq))
     # send out first round of assignments
     for kk in range(num_slaves):
         selectedi = num_sent
         print "num_sent = ",num_sent
         comm.send(selectedi,dest=kk+1)
-        print "i = ",selectedi," was sent to slave ",kk+1
+        #print "i = ",selectedi," was sent to slave ",kk+1
         num_sent +=1
     print "Master sent out first round of assignments"
     # listen for results and send out new assignments
@@ -119,7 +117,7 @@ if rank==master:
         source,entries = comm.recv(source=MPI.ANY_SOURCE)
         selectedi = comm.recv(source=source)
         # stick entry into matrix 
-        print 'entries ',entries.shape
+        #print 'entries ',entries.shape
         if num_recv%save_interval==0:
             matrix = entries # fqs x bl
         else:
@@ -129,7 +127,7 @@ if rank==master:
         if num_sent<numToDo:
             selectedi = num_sent
             comm.send(selectedi,dest=source)
-            print "Master sent out i = ",selectedi,' to slave ',source
+            #print "Master sent out i = ",selectedi,' to slave ',source
             num_sent +=1
         else:
             # send a -1 to tell slave that task is complete
@@ -137,7 +135,7 @@ if rank==master:
             print "Master sent out the finished i to slave ",source
         if num_recv%save_interval==save_interval-1:
             for ii,y_mat in enumerate(n.vsplit(matrix,matrix.shape[0])):
-                print 'ymat ',y_mat.shape
+                #print 'ymat ',y_mat.shape
                 n.savez_compressed('{0}/{1}_fq_{2:.3f}/mc_{3}'.format(mc_loc,savekey,fqs[ii],save_num),matrix=y_mat[0])
             matrix=None
             save_num+=1
@@ -150,7 +148,7 @@ elif rank<=numToDo:
     while not complete:
         # Get assignment
         selectedi = comm.recv(source=master)
-        print "slave ",rank," just recieved i = ",selectedi
+        #print "slave ",rank," just recieved i = ",selectedi
         if selectedi==-1:
             # if there are no more jobs
             complete=True
@@ -159,9 +157,10 @@ elif rank<=numToDo:
             # compute the matrix element
             fq_gsm_map = haslam_extrap(hasdat=hasmap.map.map,fqs=fqs)
             if selectedi%save_interval==0:
-                newmap = a.map.Map()
-                newmap.set_map(fq_gsm_map)
-                newmap.to_fits('{0}/{1}_fq_{2:.3f}/map_{3}.fits'.format(mc_loc,savekey,fq,selectedi),clobber=True)
+                for ii,fq in enumerate(fqs):
+                    newmap = a.map.Map()
+                    newmap.set_map(fq_gsm_map[ii,:])
+                    newmap.to_fits('{0}/{1}_fq_{2:.3f}/map.fits'.format(mc_loc,savekey,fq),clobber=True)
             element = gen_y_many_fqs(baselines,beam_sig,fq_gsm_map)
             # send answer back
             comm.send((rank,element),dest=master)
