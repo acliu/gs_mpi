@@ -67,8 +67,7 @@ num_slaves = size-1
 print "defined mpi params"
 
 # define monte_carlo directory location
-mc_loc = '/global/scratch2/sd/mpresley/gs_data/monte_carlo/'
-#mc_loc = '/global/homes/m/mpresley/gs_data/monte_carlo'
+mc_loc = '/global/scratch2/sd/mpresley/gs_data/monte_carlo'
 #mc_loc = '/Users/mpresley/soft/capo/mep/nersc_scripts/scripts/monte_carlo/'
 #mc_loc = '/Users/mpresley/Desktop'
 
@@ -139,7 +138,7 @@ if rank==master:
         if num_recv%save_interval==save_interval-1:
             for ii,y_mat in enumerate(n.vsplit(matrix,matrix.shape[0])):
                 print 'ymat ',y_mat.shape
-                n.savez_compressed('{0}/{1}_fq_{2}/mc_{3}'.format(mc_loc,savekey,fqs[ii],save_num),matrix=y_mat[0])
+                n.savez_compressed('{0}/{1}_fq_{2:.3f}/mc_{3}'.format(mc_loc,savekey,fqs[ii],save_num),matrix=y_mat[0])
             matrix=None
             save_num+=1
         num_recv += 1
@@ -159,6 +158,10 @@ elif rank<=numToDo:
         else:
             # compute the matrix element
             fq_gsm_map = haslam_extrap(hasdat=hasmap.map.map,fqs=fqs)
+            if selectedi%save_interval==0:
+                newmap = a.map.Map()
+                newmap.set_map(fq_gsm_map)
+                newmap.to_fits('{0}/{1}_fq_{2:.3f}/map_{3}.fits'.format(mc_loc,savekey,fq,selectedi),clobber=True)
             element = gen_y_many_fqs(baselines,beam_sig,fq_gsm_map)
             # send answer back
             comm.send((rank,element),dest=master)
