@@ -55,7 +55,7 @@ save_loc = '/global/scratch2/sd/mpresley/gs_data'
 maxl = 10
 _,beam_sig,del_bl,num_bl = sys.argv
 beam_sig=float(beam_sig); del_bl=float(del_bl);num_bl=int(num_bl)
-fqs = n.arange(50,91,2)
+fqs = n.arange(50,91,2)*0.001
 
 savekey = 'grid_del_bl_{0:.2f}_num_bl_{1}_beam_sig_{2:.2f}'.format(del_bl,num_bl,beam_sig)
 
