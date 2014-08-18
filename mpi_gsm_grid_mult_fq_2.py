@@ -1,4 +1,4 @@
-print "I exist!"
+#print "I exist!"
 from mpi4py import MPI 
 import sys
 import numpy as n
@@ -6,7 +6,7 @@ import useful_functions as uf
 import aipy as a
 import basic_amp_aa_grid_gauss as agg
 
-print "Everything imported!"
+#print "Everything imported!"
 
 def compute_element(bli,blj,amp):
     bix,biy,biz = bli; bjx,bjy,bjz = blj
@@ -32,12 +32,13 @@ rank = comm.Get_rank() #int associated with each processor. ranges from 0 to num
 size=comm.Get_size()
 master = 0
 num_slaves = size-1
-print "defined mpi paramters"
+#print "defined mpi paramters"
 
 # define file locations
-fits_file_loc = '/global/homes/m/mpresley/scripts/general_files/fits_files/hi1001_32.fits'
-#fits_file_loc = '/Users/mpresley/soft/gsm/data_50MHz_100MHz/gsm1001_32.fits'
-save_loc = '/global/scratch2/sd/mpresley/gs_data'
+#fits_file_loc = '/global/homes/m/mpresley/scripts/general_files/fits_files/hi1001_32.fits'
+fits_file_loc = '/Users/mpresley/soft/gsm/data_50MHz_100MHz/gsm1001_32.fits'
+#save_loc = '/global/scratch2/sd/mpresley/gs_data'
+save_loc = '/Users/mpresley/Research/Research_Adrian_Aaron/gs_data'
 
 # define parameters related to calculation
 fqs = n.arange(50,91,2)*0.001
@@ -59,35 +60,35 @@ savekey = 'grid_del_bl_{0:.2f}_num_bl_{1}_beam_sig_{2:.2f}'.format(del_bl,num_bl
 
 amp = uf.gaussian(beam_sig,n.zeros_like(theta),phi)
 baselines = agg.make_pos_array(del_bl,num_bl)
-print "defined calculation parameters"
+#print "defined calculation parameters"
 
 # define matrix to be calculated
 num = len(baselines)
 matrix = n.zeros([num,num,len(fqs)],dtype=n.complex)
 # define parameters related to task-mastering
 numToDo = num*(num+1)/2
-print 'numToDo = ',numToDo
+#print 'numToDo = ',numToDo
 assn_inds = []
 for ii in range(num+1):
     for jj in range(ii+1):
         assn_inds.append((ii,jj))
 num_sent = 0 # this functions both as a record of how many assignments have 
             # been sent and as a tag marking which matrix entry was calculated
-print "just before the big if statement"
+#print "just before the big if statement"
 
 # Big running loop
 # If I am the master process
 if rank==master:
-    print "I am the master! Muahaha!"
+#    print "I am the master! Muahaha!"
     # send out first round of assignments
     for kk in range(num_slaves):
         selectedi, selectedj = assn_inds[kk]
-        print "num_sent = ",num_sent
+#        print "num_sent = ",num_sent
         comm.send(selectedi,dest=kk+1)
         comm.send(selectedj,dest=kk+1)
-        print "i,j = ",selectedi,selectedj," was sent to slave ",kk+1
+#        print "i,j = ",selectedi,selectedj," was sent to slave ",kk+1
         num_sent +=1
-    print "Master sent out first round of assignments"
+#    print "Master sent out first round of assignments"
     # listen for results and send out new assignments
     for kk in range(numToDo):
         source,entry = comm.recv(source=MPI.ANY_SOURCE)
@@ -100,25 +101,25 @@ if rank==master:
         print 'Have completed {0} of {1}'.format(kk,numToDo)
         # if there are more things to do, send out another assignment
         if num_sent<numToDo:
-            selectedi, selectedj = assn_inds[kk]
+            selectedi, selectedj = assn_inds[num_sent]
             comm.send(selectedi,dest=source)
             comm.send(selectedj,dest=source)
-            print "Master sent out i,j = ",selectedi, selectedj,' to slave ',source
+#            print "Master sent out i,j = ",selectedi, selectedj,' to slave ',source
             num_sent +=1
         else:
             # send a -1 to tell slave that task is complete
             comm.send(-1,dest=source)
             comm.send(-1,dest=source)
-            print "Master sent out the finished i,j to slave ",source
+#            print "Master sent out the finished i,j to slave ",source
 # If I am a slave and there are not more slaves than jobs
 elif rank<=numToDo:
-    print "I am slave ",rank
+#    print "I am slave ",rank
     complete = False
     while not complete:
         # Get assignment
         selectedi = comm.recv(source=master)
         selectedj = comm.recv(source=master)
-        print "slave ",rank," just recieved i,j = ",selectedi,selectedj
+#        print "slave ",rank," just recieved i,j = ",selectedi,selectedj
         if selectedi==-1:
             # if there are no more jobs
             complete=True
@@ -132,12 +133,12 @@ elif rank<=numToDo:
             comm.send((rank,element),dest=master)
             comm.send(selectedi,dest=master)
             comm.send(selectedj,dest=master)
-            print "Slave ",rank," sent back i,j = ",selectedi,selectedj
+#            print "Slave ",rank," sent back i,j = ",selectedi,selectedj
 comm.Barrier()
 
 if rank==master:
     for ii,fq in enumerate(fqs):
-        n.savez_compressed('{0}/gsm_matrices/Q_{1}_fq_{2:.3f}'.format(save_loc,savekey,fq),matrix=matrix[:,:,ii],baselines=baselines)
+        n.savez_compressed('{0}/gsm_matrices/gsm_{1}_fq_{2:.3f}'.format(save_loc,savekey,fq),matrix=matrix[:,:,ii],baselines=baselines)
     print "The master has saved the matrix."
 
 MPI.Finalize()
