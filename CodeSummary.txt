@@ -8,7 +8,7 @@ The data-generation codes are all in the folder gs_mpi.
 
 gs_mpi/mpi_gsm_grid_mult_fq_2.py 
 	> calculates N_fg from a set of baselines that form a grid on the uv plane. In the calculation, the image space covariance is assumed to be diagonal. 
-	> The parameters del_bl (the spacing in the uv plane) and beam_sig (the angular width of the beam in radians) and num_bl (the number of baselines on each side of the grid) are system arguments. 
+	> The parameters del_bl (the spacing in the uv plane in ns) and beam_sig (the angular width of the beam in radians) and num_bl (the number of baselines on each side of the grid) are system arguments. 
 	> The range of frequencies are hard-wired into the code, as well as the location where the data files should be stored. 
 	> requires the files in gs_mpi/general_files to run.
 

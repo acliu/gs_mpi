@@ -38,7 +38,7 @@ def get_dOmega(tx,ty):
     dOmega = dx*dy/n.sqrt(1-tx*tx-ty*ty)
     return dOmega
 
-print "everything has imported"
+#print "everything has imported"
 
 # define mpi parameters
 comm = MPI.COMM_WORLD
@@ -84,7 +84,7 @@ assignment_matrix = n.arange(num0*num1).reshape((num0,num1))
 
 # define parameters related to task-mastering
 numToDo = num0*num1
-print "numToDo = ",numToDo
+#print "numToDo = ",numToDo
 num_sent = 0 # this functions both as a record of how many assignments have 
              # been sent and as a tag marking which matrix entry was calculated
     
@@ -92,17 +92,17 @@ num_sent = 0 # this functions both as a record of how many assignments have
 # Big running loop
 # If I am the master process
 if rank==master:
-    print "I am the master! Muahaha!"
+    #print "I am the master! Muahaha!"
     # send out first round of assignments
     for kk in range(num_slaves):
         selectedi, selectedj = n.where(assignment_matrix==num_sent)
         selectedi = selectedi[0]; selectedj = selectedj[0]
-        print "num_sent = ",num_sent
+        #print "num_sent = ",num_sent
         comm.send(selectedi,dest=kk+1)
         comm.send(selectedj,dest=kk+1)
-        print "i,j = ",selectedi,selectedj," was sent to slave ",kk+1
+        #print "i,j = ",selectedi,selectedj," was sent to slave ",kk+1
         num_sent +=1
-    print "Master sent out first round of assignments"
+    #print "Master sent out first round of assignments"
     # listen for results and send out new assignments
     for kk in range(numToDo):
         source,entry = comm.recv(source=MPI.ANY_SOURCE)
@@ -110,7 +110,7 @@ if rank==master:
         selectedj = comm.recv(source=source)
         # stick entry into matrix 
         matrix[selectedi,selectedj,:] = entry
-        print 'Master just received element (i,j) = ',selectedi,selectedj,' from slave ',source
+        #print 'Master just received element (i,j) = ',selectedi,selectedj,' from slave ',source
         print 'Have completed {0} of {1}'.format(kk,numToDo)
         # if there are more things to do, send out another assignment
         if num_sent<numToDo:
@@ -124,16 +124,16 @@ if rank==master:
             # send a -1 to tell slave that task is complete
             comm.send(-1,dest=source)
             comm.send(-1,dest=source)
-            print "Master sent out the finished i,j to slave ",source
+            #print "Master sent out the finished i,j to slave ",source
 # If I am a slave and there are not more slaves than jobs
 elif rank<=numToDo:
-    print "I am slave ",rank
+    #print "I am slave ",rank
     complete = False
     while not complete:
         # Get assignment
         selectedi = comm.recv(source=master)
         selectedj = comm.recv(source=master)
-        print "slave ",rank," just recieved i,j = ",selectedi,selectedj
+#        print "slave ",rank," just recieved i,j = ",selectedi,selectedj
         if selectedi==-1:
             # if there are no more jobs
             complete=True
@@ -145,7 +145,7 @@ elif rank<=numToDo:
             comm.send((rank,element),dest=master)
             comm.send(selectedi,dest=master)
             comm.send(selectedj,dest=master)
-            print "Slave ",rank," sent back i,j = ",selectedi,selectedj
+#            print "Slave ",rank," sent back i,j = ",selectedi,selectedj
 comm.Barrier()
 
 if rank==master:
