@@ -48,7 +48,8 @@ master = 0
 num_slaves = size-1
 
 # define scripts directory location
-save_loc = '/global/scratch2/sd/mpresley/gs_data'
+#save_loc = '/global/scratch2/sd/mpresley/gs_data'
+save_loc = '/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data'
 #save_loc = '/Users/mpresley/Research/Research_Adrian_Aaron/gs_data'
 
 # define parameters related to calculation 
