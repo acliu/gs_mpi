@@ -15,6 +15,9 @@ gs_mpi/mpi_gsm_grid_mult_fq_2.py
 gs_mpi/mpi_Q_grid_mult_fq_2.py 
 	> the equivalent of mpi_gsm_grid_mult_fq_2.py, only for calculating the Q matrix of the array. 
 
+gs_mpi/mpi_Q_grid_mult_fq_3.py 
+    > Adrian's modified version that does frequency-dependent beams and takes inputs from the command line
+
 gs_mpi/run_files/make_many_sub_files_grid.py 
 	> creates and submits a bunch of nersc jobs for either mpi_gsm_grid_mult_fq_2 or mpi_Q_grid_mult_fq_2, or both 
 	> loops over del_bl and beam_sig. 
