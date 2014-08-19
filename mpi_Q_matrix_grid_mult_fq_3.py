@@ -70,7 +70,7 @@ savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl
 beam_sig_fqs = beam_sig * 0.15 / fqs
 
 im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
-tx,ty,tz = im.get_top(center=(200,200)) #get coords of the zenith?
+tx,ty,tz = im.get_top(center=(200,200)) 
 dOmega = get_dOmega(tx,ty)
 valid = n.logical_not(tx.mask)
 tx,ty,tz,dOmega = tx.flatten(),ty.flatten(),tz.flatten(),dOmega.flatten()

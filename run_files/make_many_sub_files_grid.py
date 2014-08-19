@@ -3,10 +3,10 @@ import os
 
 kk=0
 for beam_sig in (0.087,):#0.175,0.349,0.689,1.047):
-    for del_bl in (4,):#6,8):
-        fcontent = """#PBS -q debug
+    for del_bl in (4.0,):#6,8):
+        fcontent = """#PBS -q regular
 #PBS -l mppwidth=24
-#PBS -l walltime=00:30:00
+#PBS -l walltime=01:30:00
 #PBS -N Q_grid_mf_{0}
 #PBS -e out_files/Q_grid_mf_{1}.$PBS_JOBID.err
 #PBS -o out_files/Q_grid_mf_{2}.$PBS_JOBID.out
