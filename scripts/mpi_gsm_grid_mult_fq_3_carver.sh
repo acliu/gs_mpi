@@ -22,6 +22,7 @@ deltaFreq=2 # in MHz
 module load python/2.7.3
 module load numpy
 module load matplotlib
+module load openmpi-gnu
 module load mpi4py
 
 # For running on my laptop or Carver
@@ -29,3 +30,4 @@ echo "Starting run now..."
 date
 mpirun -np $numProcs python-mpi "$codeLoc/mpi_gsm_grid_mult_fq_3.py" $templateMap $outputLoc $lowerFreq $upperFreq $deltaFreq $maxl $beam_sig $del_bl $sqGridSideLen
 date
+

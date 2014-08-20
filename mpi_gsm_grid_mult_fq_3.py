@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 from mpi4py import MPI 
-import sys
+import sys, os
 import numpy as n
 import useful_functions as uf
 import aipy as a
@@ -28,6 +28,9 @@ def compute_element_mult_fqs(bli,blj,amp):
     print "elements shape",elements.shape
     return elements
 
+print "Starting MPI at:"
+print os.system("date")
+
 # define mpi parameters
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank() #int associated with each processor. ranges from 0 to number of processors
@@ -35,6 +38,10 @@ size=comm.Get_size()
 master = 0
 num_slaves = size-1
 #print "defined mpi paramters"
+
+if rank==master:
+    print "MPI initialized at:"
+    print os.system("date")
 
 # define file locations
 fits_file_loc = sys.argv[1]
@@ -88,6 +95,10 @@ for ii in range(num+1):
 num_sent = 0 # this functions both as a record of how many assignments have 
             # been sent and as a tag marking which matrix entry was calculated
 #print "just before the big if statement"
+
+if rank==master:
+    print "Distributing MPI tasks now:"
+    print os.system("date")
 
 # Big running loop
 # If I am the master process
