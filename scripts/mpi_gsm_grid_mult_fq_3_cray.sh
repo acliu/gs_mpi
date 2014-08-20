@@ -1,7 +1,7 @@
 # !/bin/bash
 
 #PBS -S /bin/bash
-#PBS -N mpi_gsm_grid_mult_fq_3
+#PBS -N mpi_gsm_grid_mult_fq_3_cray
 #PBS -j eo
 #PBS -l mppwidth=24,walltime=00:30:00
 #PBS -q debug

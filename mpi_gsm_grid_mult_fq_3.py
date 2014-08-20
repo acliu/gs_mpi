@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 from mpi4py import MPI 
-import sys, os
+import sys, datetime
 import numpy as n
 import useful_functions as uf
 import aipy as a
@@ -29,7 +29,7 @@ def compute_element_mult_fqs(bli,blj,amp):
     return elements
 
 print "Starting MPI at:"
-print os.system("date")
+print datetime.datetime.now()
 
 # define mpi parameters
 comm = MPI.COMM_WORLD
@@ -41,7 +41,7 @@ num_slaves = size-1
 
 if rank==master:
     print "MPI initialized at:"
-    print os.system("date")
+    print datetime.datetime.now()
 
 # define file locations
 fits_file_loc = sys.argv[1]
@@ -98,7 +98,7 @@ num_sent = 0 # this functions both as a record of how many assignments have
 
 if rank==master:
     print "Distributing MPI tasks now:"
-    print os.system("date")
+    print datetime.datetime.now()
 
 # Big running loop
 # If I am the master process
