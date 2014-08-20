@@ -14,11 +14,11 @@ def get_Q_element_mult_fqs(tx,ty,tz,dOmega,amp,baseline,l,m):
     """
     bx,by,bz = baseline
     # compute spherical harmonic
-    Y = n.array(special.sph_harm(m,l,theta,phi)) #using math convention of theta=[0,2pi], phi=[0,pi]    
+    Y = n.array(special.sph_harm(m,l,theta,phi)) #using math convention of theta=[0,2pi], phi=[0,pi]   
     #fringe pattern
-    fqs_grid, tb_grid = n.meshgrid((bx*tx+by*ty+bz*tz),fqs)
+    tb_grid,fqs_grid = n.meshgrid((bx*tx+by*ty+bz*tz),fqs)
     phs = n.exp(-2j*n.pi*fqs_grid*tb_grid)
-    #phs = n.exp(-2j*n.pi*fqs*(bx*tx+by*ty+bz*tz)) # bl in ns, fq in GHz => bl*fq = 1
+    # bl in ns, fq in GHz => bl*fq = 1
     valid = n.logical_not(tx.mask)
 
     amp = n.where(valid, amp, n.zeros_like(amp))
@@ -35,7 +35,7 @@ def get_dOmega(tx,ty):
     dy = n.zeros_like(ty)
     for ii in range(ty.shape[0]-1):
         dy[ii,:] = n.abs(ty[ii,:]-ty[ii+1,:])
-    dy[-1,:] = dx[-2,:]
+    dy[-1,:] = dy[-2,:]
     dOmega = dx*dy/n.sqrt(1-tx*tx-ty*ty)
     return dOmega
 
@@ -55,7 +55,7 @@ save_loc = sys.argv[1]
 
 # define parameters related to calculation 
 maxl = int(sys.argv[2])
-beam_sig = float(sys.argv[3])
+beam_sig = float(sys.argv[3]) # primary beam standard deviation at 150 MHz
 del_bl = float(sys.argv[4])
 sqGridSideLen = int(sys.argv[5])
 lowerFreq = float(sys.argv[6])
@@ -69,16 +69,19 @@ savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl
 # Frequency-dependent beams
 beam_sig_fqs = beam_sig * 0.15 / fqs
 
+#im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
+#tx,ty,tz = im.get_top(center=(200,200)) 
 im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
-tx,ty,tz = im.get_top(center=(200,200)) 
+tx,ty,tz = im.get_top(center=(200,200))
 dOmega = get_dOmega(tx,ty)
 valid = n.logical_not(tx.mask)
 tx,ty,tz,dOmega = tx.flatten(),ty.flatten(),tz.flatten(),dOmega.flatten()
-theta = n.arctan(ty/tx) # using math convention of theta=[0,2pi], phi=[0,pi]
+theta = n.arctan2(ty,tx) # using math convention of theta=[0,2pi], phi=[0,pi]
 phi = n.arccos(n.sqrt(1-tx*tx-ty*ty))
 amp = n.zeros((fqs.shape[0],tx.shape[0]))
 for i,beamSize in enumerate(beam_sig_fqs):
     amp[i,:] = uf.gaussian(beamSize,n.zeros_like(theta),phi)
+
 
 # Make square grid of baselines with u=v=0 missing
 baselines = agg.make_pos_array(del_bl,sqGridSideLen)

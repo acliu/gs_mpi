@@ -34,7 +34,7 @@ def get_dOmega(tx,ty):
     dy = n.zeros_like(ty)
     for ii in range(ty.shape[0]-1):
         dy[ii,:] = n.abs(ty[ii,:]-ty[ii+1,:])
-    dy[-1,:] = dx[-2,:]
+    dy[-1,:] = dy[-2,:]
     dOmega = dx*dy/n.sqrt(1-tx*tx-ty*ty)
     return dOmega
 
@@ -66,7 +66,7 @@ tx,ty,tz = im.get_top(center=(200,200)) #get coords of the zenith?
 dOmega = get_dOmega(tx,ty)
 valid = n.logical_not(tx.mask)
 tx,ty,tz,dOmega = tx.flatten(),ty.flatten(),tz.flatten(),dOmega.flatten()
-theta = n.arctan(ty/tx) # using math convention of theta=[0,2pi], phi=[0,pi]
+theta = n.arctan2(ty,tx) # using math convention of theta=[0,2pi], phi=[0,pi]
 phi = n.arccos(n.sqrt(1-tx*tx-ty*ty))
 amp = uf.gaussian(beam_sig,n.zeros_like(theta),phi)
 
