@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 from mpi4py import MPI
+import sys
 import numpy as n
 import useful_functions as uf
 import aipy as a
