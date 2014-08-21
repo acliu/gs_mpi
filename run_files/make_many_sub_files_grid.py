@@ -3,7 +3,7 @@ import os
 
 kk=0
 for beam_sig in (0.087,):#0.175,0.349,0.689,1.047):
-    for del_bl in (4,):#6,8):
+    for del_bl in (4.0,):#6,8):
         fcontent = """#PBS -q regular
 #PBS -l mppwidth=48
 #PBS -l walltime=02:00:00
@@ -11,6 +11,7 @@ for beam_sig in (0.087,):#0.175,0.349,0.689,1.047):
 #PBS -e out_files/Q_grid_mf_{1}.$PBS_JOBID.err
 #PBS -o out_files/Q_grid_mf_{2}.$PBS_JOBID.out
 #PBS -V
+#PBS -A m1871
 
 module load python
 module load mpi4py
@@ -35,9 +36,10 @@ for beam_sig in (0.087,):#0.175,0.349,0.689,1.047):
 #PBS -e out_files/gsm_grid_{1}.$PBS_JOBID.err
 #PBS -o out_files/gsm_grid_{2}.$PBS_JOBID.out
 #PBS -V
+# #PBS -A m1871
 
-module load python
-module load mpi4py
+# module load python
+# module load mpi4py
 
 cd $PBS_O_WORKDIR 
 # beam_sig,del_bl,num_bl (for one side of grid)
