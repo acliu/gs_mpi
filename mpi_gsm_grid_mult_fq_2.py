@@ -19,7 +19,7 @@ def compute_element(bli,blj,amp):
 def compute_element_mult_fqs(bli,blj,amp):
     bix,biy,biz = bli; bjx,bjy,bjz = blj
     rx,ry,rz = crd_array
-    fqs_grid, rb_grid = n.meshgrid((bix*rx+biy*ry+biz*rz),fqs)
+    rb_grid,fqs_grid = n.meshgrid((bix*rx+biy*ry+biz*rz),fqs)
     Gi = amp*n.exp(-2j*n.pi*fqs_grid*rb_grid)*dOmega
     fqs_grid, rb_grid = n.meshgrid((bjx*rx+bjy*ry+bjz*rz),fqs)
     Gj_star = n.conj(amp*n.exp(-2j*n.pi*fqs_grid*rb_grid))*dOmega

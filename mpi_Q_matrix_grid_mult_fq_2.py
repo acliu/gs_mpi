@@ -14,7 +14,7 @@ def get_Q_element_mult_fqs(tx,ty,tz,dOmega,amp,baseline,l,m):
     # compute spherical harmonic
     Y = n.array(special.sph_harm(m,l,theta,phi)) #using math convention of theta=[0,2pi], phi=[0,pi]    
     #fringe pattern
-    fqs_grid, tb_grid = n.meshgrid((bx*tx+by*ty+bz*tz),fqs)
+    tb_grid,fqs_grid = n.meshgrid((bx*tx+by*ty+bz*tz),fqs)
     phs = n.exp(-2j*n.pi*fqs_grid*tb_grid)
     #phs = n.exp(-2j*n.pi*fqs*(bx*tx+by*ty+bz*tz)) # bl in ns, fq in GHz => bl*fq = 1
 #    tx.shape = im.uv.shape
