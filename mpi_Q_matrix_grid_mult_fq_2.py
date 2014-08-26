@@ -14,7 +14,7 @@ def get_Q_element_mult_fqs(tx,ty,tz,dOmega,amp,baseline,l,m):
     # compute spherical harmonic
     Y = n.array(special.sph_harm(m,l,theta,phi)) #using math convention of theta=[0,2pi], phi=[0,pi]    
     #fringe pattern
-    fqs_grid, tb_grid = n.meshgrid((bx*tx+by*ty+bz*tz),fqs)
+    tb_grid,fqs_grid = n.meshgrid((bx*tx+by*ty+bz*tz),fqs)
     phs = n.exp(-2j*n.pi*fqs_grid*tb_grid)
     #phs = n.exp(-2j*n.pi*fqs*(bx*tx+by*ty+bz*tz)) # bl in ns, fq in GHz => bl*fq = 1
 #    tx.shape = im.uv.shape
@@ -34,7 +34,7 @@ def get_dOmega(tx,ty):
     dy = n.zeros_like(ty)
     for ii in range(ty.shape[0]-1):
         dy[ii,:] = n.abs(ty[ii,:]-ty[ii+1,:])
-    dy[-1,:] = dx[-2,:]
+    dy[-1,:] = dy[-2,:]
     dOmega = dx*dy/n.sqrt(1-tx*tx-ty*ty)
     return dOmega
 
@@ -48,7 +48,8 @@ master = 0
 num_slaves = size-1
 
 # define scripts directory location
-save_loc = '/global/scratch2/sd/mpresley/gs_data'
+#save_loc = '/global/scratch2/sd/mpresley/gs_data'
+save_loc = '/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data'
 #save_loc = '/Users/mpresley/Research/Research_Adrian_Aaron/gs_data'
 
 # define parameters related to calculation 
@@ -65,7 +66,7 @@ tx,ty,tz = im.get_top(center=(200,200)) #get coords of the zenith?
 dOmega = get_dOmega(tx,ty)
 valid = n.logical_not(tx.mask)
 tx,ty,tz,dOmega = tx.flatten(),ty.flatten(),tz.flatten(),dOmega.flatten()
-theta = n.arctan(ty/tx) # using math convention of theta=[0,2pi], phi=[0,pi]
+theta = n.arctan2(ty,tx) # using math convention of theta=[0,2pi], phi=[0,pi]
 phi = n.arccos(n.sqrt(1-tx*tx-ty*ty))
 amp = uf.gaussian(beam_sig,n.zeros_like(theta),phi)
 

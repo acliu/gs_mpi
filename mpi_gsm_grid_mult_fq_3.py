@@ -1,5 +1,6 @@
-#print "I exist!"
-from mpi4py import MPI 
+#! /usr/bin/env python
+
+from mpi4py import MPI
 import sys
 import numpy as n
 import useful_functions as uf
@@ -19,11 +20,12 @@ def compute_element(bli,blj,amp):
 def compute_element_mult_fqs(bli,blj,amp):
     bix,biy,biz = bli; bjx,bjy,bjz = blj
     rx,ry,rz = crd_array
-    rb_grid,fqs_grid = n.meshgrid((bix*rx+biy*ry+biz*rz),fqs)
+    rb_grid, fqs_grid = n.meshgrid((bix*rx+biy*ry+biz*rz),fqs)
     Gi = amp*n.exp(-2j*n.pi*fqs_grid*rb_grid)*dOmega
-    fqs_grid, rb_grid = n.meshgrid((bjx*rx+bjy*ry+bjz*rz),fqs)
+    rb_grid, fqs_grid = n.meshgrid((bjx*rx+bjy*ry+bjz*rz),fqs)
     Gj_star = n.conj(amp*n.exp(-2j*n.pi*fqs_grid*rb_grid))*dOmega
     elements = uf.vdot(Gi*Gj_star,Rsq)
+    print "elements shape",elements.shape
     return elements
 
 # define mpi parameters
@@ -35,13 +37,24 @@ num_slaves = size-1
 #print "defined mpi paramters"
 
 # define file locations
-#fits_file_loc = '/global/homes/m/mpresley/scripts/general_files/fits_files/hi1001_32.fits'
-fits_file_loc = '/Users/mpresley/soft/gsm/data_50MHz_100MHz/gsm1001_32.fits'
-#save_loc = '/global/scratch2/sd/mpresley/gs_data'
-save_loc = '/Users/mpresley/Research/Research_Adrian_Aaron/gs_data'
+fits_file_loc = sys.argv[1]
+#'/Users/mpresley/soft/gsm/data_50MHz_100MHz/gsm1001_32.fits'
+save_loc = sys.argv[2]
+#'/Users/mpresley/Research/Research_Adrian_Aaron/gs_data'
+lowerFreq = float(sys.argv[3])
+upperFreq = float(sys.argv[4])
+freqSpace = float(sys.argv[5])
+maxl = int(sys.argv[6])
+beam_sig = float(sys.argv[7])
+del_bl = float(sys.argv[8])
+sqGridSideLen = int(sys.argv[9])
 
 # define parameters related to calculation
-fqs = n.arange(50,91,2)*0.001
+fqs = n.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
+fqs /= 1000. # Convert from MHz to GHz
+# Frequency-dependent beams
+beam_sig_fqs = beam_sig * 0.15 / fqs
+
 healmap = a.map.Map(fromfits=fits_file_loc)
 global px_array; px_array = n.arange(healmap.npix()) # gets an array of healpix pixel indices
 global crd_array; crd_array = n.array(healmap.px2crd(px_array,ncrd=3)) # finds the topocentric coords for each healpix pixel
@@ -52,14 +65,14 @@ phi,theta = n.array(healmap.px2crd(px_array,ncrd=2))
 #print 'theta max = ',max(theta)
 #print 'phi max = ',max(phi)
 
-maxl = 10
-_,beam_sig,del_bl,num_bl = sys.argv
-beam_sig=float(beam_sig); del_bl=float(del_bl); num_bl=int(num_bl)
 
-savekey = 'grid_del_bl_{0:.2f}_num_bl_{1}_beam_sig_{2:.2f}'.format(del_bl,num_bl,beam_sig)
 
-amp = uf.gaussian(beam_sig,n.zeros_like(theta),phi)
-baselines = agg.make_pos_array(del_bl,num_bl)
+savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+amp = n.zeros((fqs.shape[0],len(phi)))
+for i,beamSize in enumerate(beam_sig_fqs):
+    amp[i,:] = uf.gaussian(beamSize,n.zeros_like(theta),phi)
+baselines = agg.make_pos_array(del_bl,sqGridSideLen)
+
 #print "defined calculation parameters"
 
 # define matrix to be calculated
@@ -98,7 +111,7 @@ if rank==master:
         matrix[selectedi,selectedj,:] = entry
         matrix[selectedj,selectedi,:] = n.conj(entry)
         print 'Master just received element (i,j) = ',selectedi,selectedj,' from slave ',source
-        print 'Have completed {0} of {1}'.format(kk,numToDo)
+        print 'Have completed {0} of {1}'.format(kk+1,numToDo)
         # if there are more things to do, send out another assignment
         if num_sent<numToDo:
             selectedi, selectedj = assn_inds[num_sent]
@@ -123,7 +136,7 @@ elif rank<=numToDo:
         if selectedi==-1:
             # if there are no more jobs
             complete=True
-            print "slave ",rank," acknoledges job completion"
+            print "slave ",rank," acknowledges job completion"
         else:
             # compute the matrix element
             bli = baselines[selectedi,:]

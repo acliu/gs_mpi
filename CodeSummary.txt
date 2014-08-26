@@ -12,8 +12,14 @@ gs_mpi/mpi_gsm_grid_mult_fq_2.py
 	> The range of frequencies are hard-wired into the code, as well as the location where the data files should be stored. 
 	> requires the files in gs_mpi/general_files to run.
 
+gs_mpi/mpi_gsm_grid_mult_fq_3.py 
+    > Adrian's modified version that takes in more command line inputs and 
+
 gs_mpi/mpi_Q_grid_mult_fq_2.py 
 	> the equivalent of mpi_gsm_grid_mult_fq_2.py, only for calculating the Q matrix of the array. 
+
+gs_mpi/mpi_Q_grid_mult_fq_3.py 
+    > Adrian's modified version that does frequency-dependent beams and takes inputs from the command line
 
 gs_mpi/run_files/make_many_sub_files_grid.py 
 	> creates and submits a bunch of nersc jobs for either mpi_gsm_grid_mult_fq_2 or mpi_Q_grid_mult_fq_2, or both 

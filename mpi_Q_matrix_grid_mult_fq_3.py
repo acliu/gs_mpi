@@ -1,30 +1,31 @@
+#! /usr/bin/env python
+
 from mpi4py import MPI 
 import sys
 import aipy as a, numpy as n
-import capo as C
 import useful_functions as uf
 from scipy import special
 import basic_amp_aa_grid_gauss as agg
 
-def get_single_Q_element(im,(tx,ty,tz),dOmega,amp,baseline,l,m):
+def get_Q_element_mult_fqs(tx,ty,tz,dOmega,amp,baseline,l,m):
+    """
+    This returns a vector of Q elements for multiple frequencies, so the 
+    vector is the same length as fqs. 
+    """
     bx,by,bz = baseline
     # compute spherical harmonic
-    tx,ty,tz = tx.flatten(),ty.flatten(),tz.flatten()
-    theta = n.arctan(ty/tx) # using math convention of theta=[0,2pi], phi=[0,pi]
-    phi = n.arccos(n.sqrt(1-tx*tx-ty*ty))
-    Y = n.array(special.sph_harm(m,l,theta,phi)) #using math convention of theta=[0,2pi], phi=[0,pi]    
+    Y = n.array(special.sph_harm(m,l,theta,phi)) #using math convention of theta=[0,2pi], phi=[0,pi]   
     #fringe pattern
-    phs = n.exp(-2j*n.pi*fq * (bx*tx+by*ty+bz*tz)) 
-    # not sure if I actually need this stuff
-    tx.shape = im.uv.shape
+    tb_grid,fqs_grid = n.meshgrid((bx*tx+by*ty+bz*tz),fqs)
+    phs = n.exp(-2j*n.pi*fqs_grid*tb_grid)
+    # bl in ns, fq in GHz => bl*fq = 1
     valid = n.logical_not(tx.mask)
-    tx = tx.flatten()
-    Y.shape = phs.shape = amp.shape = im.uv.shape
+
     amp = n.where(valid, amp, n.zeros_like(amp))
     phs = n.where(valid, phs, n.zeros_like(phs))
     Y = n.where(valid, Y, n.zeros_like(Y)) 
-    Q_element = n.sum(amp*Y*phs*dOmega)
-    return Q_element
+    Q_elements = uf.vdot(phs*amp,Y*dOmega) #n.sum(amp*Y*phs*dOmega)
+    return Q_elements
 
 def get_dOmega(tx,ty):
     dx = n.zeros_like(tx)
@@ -34,9 +35,11 @@ def get_dOmega(tx,ty):
     dy = n.zeros_like(ty)
     for ii in range(ty.shape[0]-1):
         dy[ii,:] = n.abs(ty[ii,:]-ty[ii+1,:])
-    dy[-1,:] = dx[-2,:]
+    dy[-1,:] = dy[-2,:]
     dOmega = dx*dy/n.sqrt(1-tx*tx-ty*ty)
     return dOmega
+
+print "everything has imported"
 
 # define mpi parameters
 comm = MPI.COMM_WORLD
@@ -45,38 +48,58 @@ size=comm.Get_size()
 master = 0
 num_slaves = size-1
 
+# define scripts directory location
+save_loc = sys.argv[1]
+#save_loc = '/global/scratch2/sd/mpresley/gs_data'
+#save_loc = '/Users/mpresley/Research/Research_Adrian_Aaron/gs_data'
+
 # define parameters related to calculation 
-maxl = 10
-_,beam_sig,del_bl,num_bl = sys.argv
-beam_sig=float(beam_sig); del_bl=float(del_bl);num_bl=int(num_bl)
+maxl = int(sys.argv[2])
+beam_sig = float(sys.argv[3]) # primary beam standard deviation at 150 MHz
+del_bl = float(sys.argv[4])
+sqGridSideLen = int(sys.argv[5])
+lowerFreq = float(sys.argv[6])
+upperFreq = float(sys.argv[7])
+freqSpace = float(sys.argv[8])
+fqs = n.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
+fqs /= 1000. # Convert from MHz to GHz
 
-savekey = 'grid_del_bl_{0:.2f}_num_bl_{1}_beam_sig_{2:.2f}_'.format(del_bl,num_bl,beam_sig)
-fq = 0.1
+savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
 
+# Frequency-dependent beams
+beam_sig_fqs = beam_sig * 0.15 / fqs
+
+#im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
+#tx,ty,tz = im.get_top(center=(200,200)) 
 im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
-tx,ty,tz = im.get_top(center=(200,200)) #get coords of the zenith?
+tx,ty,tz = im.get_top(center=(200,200))
 dOmega = get_dOmega(tx,ty)
 valid = n.logical_not(tx.mask)
-tx,ty,tz = tx.flatten(),ty.flatten(),tz.flatten()
-theta = n.arctan(ty/tx) # using math convention of theta=[0,2pi], phi=[0,pi]
+tx,ty,tz,dOmega = tx.flatten(),ty.flatten(),tz.flatten(),dOmega.flatten()
+theta = n.arctan2(ty,tx) # using math convention of theta=[0,2pi], phi=[0,pi]
 phi = n.arccos(n.sqrt(1-tx*tx-ty*ty))
-amp = uf.gaussian(beam_sig,n.zeros_like(theta),phi)
+amp = n.zeros((fqs.shape[0],tx.shape[0]))
+for i,beamSize in enumerate(beam_sig_fqs):
+    amp[i,:] = uf.gaussian(beamSize,n.zeros_like(theta),phi)
 
-baselines = agg.make_pos_array(del_bl,num_bl)
+
+# Make square grid of baselines with u=v=0 missing
+baselines = agg.make_pos_array(del_bl,sqGridSideLen)
 
 num0,num1 = len(baselines),(maxl+1)*(maxl+1)
-print "num baselines = {0}\n num lms = {1}".format(num0,num1)
+print "num baselines = {0}\nnum lms = {1}".format(num0,num1)
 lms = n.zeros([num1,2])
 ii=0
 for ll in range(maxl+1):
 	for mm in range(-ll,ll+1):
 		lms[ii] = n.array([ll,mm])
 		ii+=1
-matrix = n.zeros([num0,num1],dtype=n.complex)
-assignment_matrix = n.arange(n.prod(matrix.shape)).reshape(matrix.shape)
+matrix = n.zeros([num0,num1,len(fqs)],dtype=n.complex)
+assignment_matrix = n.arange(num0*num1).reshape((num0,num1))
 
 # define parameters related to task-mastering
 numToDo = num0*num1
+print "numToDo = ",numToDo
 num_sent = 0 # this functions both as a record of how many assignments have 
              # been sent and as a tag marking which matrix entry was calculated
     
@@ -101,8 +124,9 @@ if rank==master:
         selectedi = comm.recv(source=source)
         selectedj = comm.recv(source=source)
         # stick entry into matrix 
-        matrix[selectedi,selectedj] = entry
+        matrix[selectedi,selectedj,:] = entry
         print 'Master just received element (i,j) = ',selectedi,selectedj,' from slave ',source
+        print 'Have completed {0} of {1}'.format(kk,numToDo)
         # if there are more things to do, send out another assignment
         if num_sent<numToDo:
             selectedi, selectedj = n.where(assignment_matrix==num_sent)
@@ -128,10 +152,10 @@ elif rank<=numToDo:
         if selectedi==-1:
             # if there are no more jobs
             complete=True
-            print "slave ",rank," acknoledges job completion"
+            print "slave ",rank," acknowledges job completion"
         else:
             # compute the matrix element
-            element = get_single_Q_element(im,(tx,ty,tz),dOmega,amp,baselines[selectedi],lms[selectedj,0],lms[selectedj,1])
+            element = get_Q_element_mult_fqs(tx,ty,tz,dOmega,amp,baselines[selectedi],lms[selectedj,0],lms[selectedj,1])
             # send answer back
             comm.send((rank,element),dest=master)
             comm.send(selectedi,dest=master)
@@ -140,7 +164,8 @@ elif rank<=numToDo:
 comm.Barrier()
 
 if rank==master:
-    n.savez_compressed('/global/homes/m/mpresley/scripts/Q_matrices/{0}Q_max_l_{1}'.format(savekey,maxl),Q=matrix,baselines=baselines,lms=lms)
+    for ii,fq in enumerate(fqs):
+        n.savez_compressed('{0}/Q_matrices/Q_{1}_fq_{2:.3f}'.format(save_loc,savekey,fq),Q=matrix[:,:,ii],baselines=baselines,lms=lms)
     print "The master has saved the matrix."
 
 MPI.Finalize()
