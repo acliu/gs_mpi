@@ -7,6 +7,8 @@
 #PBS -q regular
 #PBS -A m1871
 
+# Took 02:04:00 mins on this config
+
 codeLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi"
 outputLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data"
 numProcs=72
