@@ -3,7 +3,6 @@
 import aipy as ap, numpy as np, sys
 import useful_functions as uf
 import basic_amp_aa_grid_gauss as agg
-import capo as C
 
 
 if __name__=='__main__': 
