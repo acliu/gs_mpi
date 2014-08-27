@@ -25,7 +25,7 @@ def haslam_extrap(hasdat=None,fqs=n.array([0.1,])):
     fqdat = hasdat_grid*(fq_grid/0.408)**(alf-alf0) 
     return fqdat
 
-def generate_sky_model_y(baselines,beam_sig,gsm_map=None,gsm_data_file=None):
+def generate_sky_model_y(baselines,beam_sig,fq,gsm_map=None,gsm_data_file=None):
     """
     y is a vector of the visibilities at different baselines
     """
@@ -47,14 +47,14 @@ def generate_sky_model_y(baselines,beam_sig,gsm_map=None,gsm_data_file=None):
     visibilities = n.zeros(baselines.shape[0],dtype='complex')
     for kk in range(baselines.shape[0]):
         bx,by,bz = baselines[kk]
-        Vis = amp*true_sky*n.exp(2j*n.pi*(bx*rx+by*ry+bz*rz))*dOmega
+        Vis = amp*true_sky*n.exp(2j*fq*n.pi*(bx*rx+by*ry+bz*rz))*dOmega
         visibilities[kk] = n.sum(Vis)
     return visibilities
 
-def gen_y_many_fqs(baselines,beam_sig,fq_gsm_map):
+def gen_y_many_fqs(baselines,beam_sig,fqs,fq_gsm_map):
     ys = n.zeros((fq_gsm_map.shape[0],baselines.shape[0]),dtype='complex')
-    for ii in n.arange(fq_gsm_map.shape[0]):
-        ys[ii,:] = generate_sky_model_y(baselines,beam_sig,gsm_map=fq_gsm_map[ii,:])
+    for ii,fq in enumerate(fqs):
+        ys[ii,:] = generate_sky_model_y(baselines,beam_sig,fq,gsm_map=fq_gsm_map[ii,:])
     return ys 
 
 # define mpi parameters
@@ -161,7 +161,7 @@ elif rank<=numToDo:
                     newmap = a.map.Map()
                     newmap.set_map(fq_gsm_map[ii,:])
                     newmap.to_fits('{0}/{1}_fq_{2:.3f}/map.fits'.format(mc_loc,savekey,fq),clobber=True)
-            element = gen_y_many_fqs(baselines,beam_sig,fq_gsm_map)
+            element = gen_y_many_fqs(baselines,beam_sig,fqs,fq_gsm_map)
             # send answer back
             comm.send((rank,element),dest=master)
             comm.send(selectedi,dest=master)
