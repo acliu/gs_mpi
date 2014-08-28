@@ -3,6 +3,7 @@
 from mpi4py import MPI 
 import sys, os
 import numpy as n, aipy as a
+import basic_amp_aa_grid_gauss as agg
 
 def haslam_extrap(chunkLen,randos):
     """
@@ -73,7 +74,8 @@ fqs = n.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
 fqs /= 1000. # Convert from MHz to GHz
 numFreqs = fqs.shape[0]
 npix = 12 * nside * nside
-numBl = sqGridSideLen * sqGridSideLen - 1
+baselines = agg.make_uhp_bls(del_bl,sqGridSideLen)
+numBl = len(baselines)
 
 # This code does not use del_bl, sqGridSideLen, or beam_sig for
 # anything other than filename definitions

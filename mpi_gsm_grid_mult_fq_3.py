@@ -71,7 +71,8 @@ savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl
 amp = n.zeros((fqs.shape[0],len(phi)))
 for i,beamSize in enumerate(beam_sig_fqs):
     amp[i,:] = uf.gaussian(beamSize,n.zeros_like(theta),phi)
-baselines = agg.make_pos_array(del_bl,sqGridSideLen)
+#baselines = agg.make_pos_array(del_bl,sqGridSideLen)
+baselines = agg.make_uhp_bls(del_bl,sqGridSideLen)
 
 #print "defined calculation parameters"
 

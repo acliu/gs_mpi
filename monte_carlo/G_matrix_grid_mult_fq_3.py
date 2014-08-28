@@ -18,7 +18,8 @@ if __name__=='__main__':
 
     savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
 
-    baselines = agg.make_pos_array(del_bl,sqGridSideLen)
+    #baselines = agg.make_pos_array(del_bl,sqGridSideLen)
+    baselines = agg.make_uhp_bls(del_bl,sqGridSideLen)
     numBl = len(baselines)
     dOmega = 4 * np.pi / npix
 
