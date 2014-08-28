@@ -84,7 +84,8 @@ for i,beamSize in enumerate(beam_sig_fqs):
 
 
 # Make square grid of baselines with u=v=0 missing
-baselines = agg.make_pos_array(del_bl,sqGridSideLen)
+#baselines = agg.make_pos_array(del_bl,sqGridSideLen)
+baselines = agg.make_uhp_bls(del_bl,sqGridSideLen)
 
 num0,num1 = len(baselines),(maxl+1)*(maxl+1)
 print "num baselines = {0}\nnum lms = {1}".format(num0,num1)
