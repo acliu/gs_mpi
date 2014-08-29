@@ -31,7 +31,7 @@ if __name__=='__main__':
     fqs = np.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
     fqs /= 1000. # Convert from MHz to GHz
     #beam_sig_fqs = beam_sig * 0.15 / fqs
-    beam_sig_fqs = beam_sig * n.ones_like(fqs)
+    beam_sig_fqs = beam_sig * np.ones_like(fqs)
     primaryBeam = np.zeros((fqs.shape[0],npix))
     for i,beamSize in enumerate(beam_sig_fqs):
         primaryBeam[i,:] = uf.gaussian(beamSize,np.zeros(npix),directionVects_thetas)
