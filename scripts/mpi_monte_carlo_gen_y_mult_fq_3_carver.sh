@@ -3,8 +3,8 @@
 #PBS -S /bin/bash
 #PBS -N mpi_monte_carlo_gen_y_fq_3_carver
 #PBS -j eo
-#PBS -l nodes=1:ppn=8,walltime=00:30:00
-#PBS -q debug
+#PBS -l nodes=3:ppn=8,walltime=01:30:00
+#PBS -q regular
 #PBS -A m1871
 
 
@@ -14,17 +14,25 @@ templateLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/skyTemp
 GmatrixLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data"
 pertFile="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/skyTemplates/perturbationVariances.dat"
 nside=32
-beam_sig=0.064614317 # in radians.  HERA beam at 150 MHz
-del_bl=23 # in nanoseconds.  HERA
-sqGridSideLen=5
-lowerFreq=50 # in MHz
-upperFreq=90 # in MHz
-deltaFreq=2 # in MHz
+beam_sig=1.57 
+del_bl=0.844 
+sqGridSideLen=12
+lowerFreq=120 # in MHz
+upperFreq=150 # in MHz
+deltaFreq=1 # in MHz
 numPertComponents=3
 
-numMCs=100
-saveInterval=11
-numProcs=8
+#beam_sig=0.064614317 # in radians.  HERA beam at 150 MHz
+#del_bl=23 # in nanoseconds.  HERA
+#sqGridSideLen=5
+#lowerFreq=50 # in MHz
+#upperFreq=90 # in MHz
+#deltaFreq=2 # in MHz
+#numPertComponents=3
+
+numMCs=10000
+saveInterval=300
+numProcs=24
 
 module load python/2.7.3
 module load numpy

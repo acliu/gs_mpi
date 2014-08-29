@@ -3,8 +3,8 @@
 #PBS -S /bin/bash
 #PBS -N mpi_gsm_grid_mult_fq_3_carver
 #PBS -j eo
-#PBS -l nodes=3:ppn=8,walltime=00:30:00
-#PBS -q debug
+#PBS -l nodes=3:ppn=8,walltime=02:30:00
+#PBS -q regular
 #PBS -A m1871
 
 codeLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi"
