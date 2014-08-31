@@ -54,6 +54,8 @@ size=comm.Get_size()
 master = 0
 num_slaves = size-1
 
+print "Mode 1 alpha"
+
 mc_loc = sys.argv[1]
 hasmap_loc = sys.argv[2]
 Gmatrix_loc = sys.argv[3]
@@ -69,6 +71,7 @@ pertFile = sys.argv[12]
 numMCs = int(sys.argv[13])
 saveInterval = int(sys.argv[14])
 
+print "Mode 1 bravo"
 
 fqs = n.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
 fqs /= 1000. # Convert from MHz to GHz
@@ -77,6 +80,8 @@ npix = 12 * nside * nside
 baselines = agg.make_uhp_bls(del_bl,sqGridSideLen)
 numBl = len(baselines)
 
+print "Mode 2 alpha"
+
 # This code does not use del_bl, sqGridSideLen, or beam_sig for
 # anything other than filename definitions
 savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
@@ -84,6 +89,8 @@ Gmatrices = n.zeros((numFreqs,numBl,npix),dtype=complex)
 for i,freq in enumerate(fqs):
     tempMatrix = n.load('{0}/G_matrices/G_{1}_fq_{2:.3f}.npz'.format(Gmatrix_loc,savekey,freq))
     Gmatrices[i] = tempMatrix['matrix'] # All processes read in the G matrices
+
+print "Mode 3 alpha"
 
 # Everyone reads in the Haslam map and forms the extrapolation to lower frequencies
 pertVar = n.loadtxt(pertFile) # First component of this is the unperturbed spectral index
@@ -173,4 +180,5 @@ elif rank<=numChunks:
             comm.send((rank,selectedChunkNum),dest=master)
             print "Slave ",rank," sent back i = ",selectedChunkNum
 comm.Barrier()
+MPI.Finalize()
 

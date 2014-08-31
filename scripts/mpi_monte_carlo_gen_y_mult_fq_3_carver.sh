@@ -3,7 +3,7 @@
 #PBS -S /bin/bash
 #PBS -N mpi_monte_carlo_gen_y_fq_3_carver
 #PBS -j eo
-#PBS -l nodes=3:ppn=8,walltime=01:30:00
+#PBS -l nodes=3:ppn=4,walltime=01:00:00,pvmem=5GB
 #PBS -q regular
 #PBS -A m1871
 
@@ -31,8 +31,8 @@ numPertComponents=3
 #numPertComponents=3
 
 numMCs=10000
-saveInterval=300
-numProcs=24
+saveInterval=150
+numProcs=12
 
 module load python/2.7.3
 module load numpy
@@ -41,10 +41,10 @@ module load openmpi-gnu
 module load mpi4py
 
 echo "Starting run now..."
-echo "Computing G matrices..."
-date
-python "$codeLoc/G_matrix_grid_mult_fq_3.py" $nside $lowerFreq $upperFreq $deltaFreq $beam_sig $del_bl $sqGridSideLen $GmatrixLoc
-date
+#echo "Computing G matrices..."
+#date
+#python "$codeLoc/G_matrix_grid_mult_fq_3.py" $nside $lowerFreq $upperFreq $deltaFreq $beam_sig $del_bl $sqGridSideLen $GmatrixLoc
+#date
 echo "...Done! Now creating directories for Monte Carlos"
 date
 python "$codeLoc/create_MC_directories.py" $outputLoc $del_bl $sqGridSideLen $beam_sig $lowerFreq $upperFreq $deltaFreq
