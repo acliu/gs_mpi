@@ -1,7 +1,7 @@
 # !/bin/bash
 
 #PBS -S /bin/bash
-#PBS -N mpi_monte_carlo_gen_y_fq_3_carver
+#PBS -N logFiles/mpi_monte_carlo_gen_y_fq_3_carver
 #PBS -j eo
 #PBS -l nodes=3:ppn=4,walltime=01:00:00,pvmem=5GB
 #PBS -q regular

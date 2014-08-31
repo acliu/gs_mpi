@@ -7,6 +7,8 @@
 #PBS -q regular
 #PBS -A m1871
 
+# Takes just 3 minutes and 14 seconds!
+
 codeLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi"
 outputLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data"
 templateMap='/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/skyTemplates/GSM_templateMap_70MHz_nside32.fits'
