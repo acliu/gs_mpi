@@ -16,6 +16,9 @@ sqGridSideLen=12
 lowerFreq=120 # in MHz
 upperFreq=150 # in MHz
 deltaFreq=1 # in MHz
+variableBeam=0
+# 0 is freq-independent primary beam
+# 1 is beam size proportional to wavelength, with beam_sig defined to be the size at 150 MHz
 
 numMCs=10000
 saveInterval=150
@@ -27,6 +30,6 @@ module load matplotlib
 
 echo "Consolidating MC results"
 date
-python "$codeLoc/consolidate_MCs.py" $outputLoc $del_bl $sqGridSideLen $beam_sig $lowerFreq $upperFreq $deltaFreq $numMCs $saveInterval
+python "$codeLoc/consolidate_MCs.py" $outputLoc $del_bl $sqGridSideLen $beam_sig $lowerFreq $upperFreq $deltaFreq $variableBeam $numMCs $saveInterval
 date
 echo "...all done!"

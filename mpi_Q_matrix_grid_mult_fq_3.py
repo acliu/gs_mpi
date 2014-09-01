@@ -61,14 +61,17 @@ sqGridSideLen = int(sys.argv[5])
 lowerFreq = float(sys.argv[6])
 upperFreq = float(sys.argv[7])
 freqSpace = float(sys.argv[8])
+variableBeam = int(sys.argv[9])
 fqs = n.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
 fqs /= 1000. # Convert from MHz to GHz
 
-savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+if variableBeam == 0:
+    savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_fixedWidth_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+    beam_sig_fqs = beam_sig * n.ones_like(fqs)
+elif variableBeam == 1:
+    savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_lambdaBeam_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+    beam_sig_fqs = beam_sig * 0.15 / fqs
 
-# Frequency-dependent beams
-#beam_sig_fqs = beam_sig * 0.15 / fqs
-beam_sig_fqs = beam_sig * n.ones_like(fqs)
 
 #im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
 #tx,ty,tz = im.get_top(center=(200,200)) 

@@ -48,13 +48,17 @@ maxl = int(sys.argv[6])
 beam_sig = float(sys.argv[7])
 del_bl = float(sys.argv[8])
 sqGridSideLen = int(sys.argv[9])
+variableBeam = int(sys.argv[10])
 
 # define parameters related to calculation
 fqs = n.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
 fqs /= 1000. # Convert from MHz to GHz
-# Frequency-dependent beams
-#beam_sig_fqs = beam_sig * 0.15 / fqs
-beam_sig_fqs = beam_sig * n.ones_like(fqs)
+if variableBeam == 0:
+    savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_fixedWidth_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+    beam_sig_fqs = beam_sig * n.ones_like(fqs)
+elif variableBeam == 1:
+    savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_lambdaBeam_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+    beam_sig_fqs = beam_sig * 0.15 / fqs
 
 healmap = a.map.Map(fromfits=fits_file_loc)
 global px_array; px_array = n.arange(healmap.npix()) # gets an array of healpix pixel indices
@@ -66,9 +70,6 @@ phi,theta = n.array(healmap.px2crd(px_array,ncrd=2))
 #print 'theta max = ',max(theta)
 #print 'phi max = ',max(phi)
 
-
-
-savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
 amp = n.zeros((fqs.shape[0],len(phi)))
 for i,beamSize in enumerate(beam_sig_fqs):
     amp[i,:] = uf.gaussian(beamSize,n.zeros_like(theta),phi)

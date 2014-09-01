@@ -14,9 +14,13 @@ if __name__=='__main__':
     beam_sig = float(sys.argv[5])
     del_bl = float(sys.argv[6])
     sqGridSideLen = int(sys.argv[7])
-    save_loc = sys.argv[8]
+    variableBeam = int(sys.argv[8])
+    save_loc = sys.argv[9]
 
-    savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+    if variableBeam == 0:
+        savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_fixedWidth_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+    elif variableBeam == 1:
+        savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_lambdaBeam_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
 
     #baselines = agg.make_pos_array(del_bl,sqGridSideLen)
     baselines = agg.make_uhp_bls(del_bl,sqGridSideLen)
@@ -30,8 +34,12 @@ if __name__=='__main__':
     
     fqs = np.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
     fqs /= 1000. # Convert from MHz to GHz
-    #beam_sig_fqs = beam_sig * 0.15 / fqs
-    beam_sig_fqs = beam_sig * np.ones_like(fqs)
+
+    if variableBeam == 0:
+        beam_sig_fqs = beam_sig * np.ones_like(fqs)
+    elif variableBeam == 1:
+        beam_sig_fqs = beam_sig * 0.15 / fqs
+    
     primaryBeam = np.zeros((fqs.shape[0],npix))
     for i,beamSize in enumerate(beam_sig_fqs):
         primaryBeam[i,:] = uf.gaussian(beamSize,np.zeros(npix),directionVects_thetas)
