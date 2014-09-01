@@ -1,8 +1,8 @@
-print "I exist"
+#! /usr/bin/env python
+
 from mpi4py import MPI 
 import sys, os
 import aipy as a, numpy as n, pylab as p
-import capo as C
 import basic_amp_aa_grid_gauss as agg
 import useful_functions as uf
 import matplotlib as mpl

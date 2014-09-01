@@ -19,6 +19,10 @@ numMCs=100
 saveInterval=13
 numProcs=4
 
+python "$codeLoc/G_matrix_grid_mult_fq_3.py" $nside $lowerFreq $upperFreq $deltaFreq $beam_sig $del_bl $sqGridSideLen $GmatrixLoc
+
 python "$codeLoc/create_MC_directories.py" $outputLoc $del_bl $sqGridSideLen $beam_sig $lowerFreq $upperFreq $deltaFreq
 
 mpirun -np $numProcs python "$codeLoc/mpi_monte_carlo_gen_y_mult_fq_3.py" $outputLoc $templateLoc $GmatrixLoc $nside $del_bl $sqGridSideLen $beam_sig $lowerFreq $upperFreq $deltaFreq $numPertComponents $pertFile $numMCs $saveInterval
+
+python "$codeLoc/consolidate_MCs.py" $outputLoc $del_bl $sqGridSideLen $beam_sig $lowerFreq $upperFreq $deltaFreq $numMCs $saveInterval
