@@ -67,7 +67,7 @@ print "defined mpi params"
 
 # define monte_carlo directory location
 mc_loc = '/global/scratch2/sd/mpresley/gs_data/monte_carlo'
-#mc_loc = '/Users/mpresley/Desktop'
+#mc_loc = '/Users/mpresley/Research/Research_Adrian_Aaron/gs_data/monte_carlo'
 
 # define parameters related to calculation 
 #hasmap = a.map.Map(fromfits='/Users/mpresley/soft/gsm/haslam408_32.fits')
