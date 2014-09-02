@@ -2,7 +2,7 @@
 #PBS -S /bin/bash
 #PBS -N mpi_improvedNfg_carver
 #PBS -j eo
-#PBS -l nodes=1:ppn=8,walltime=00:30:00
+#PBS -l nodes=2:ppn=4,walltime=00:30:00,pvmem=5GB
 #PBS -q debug
 #PBS -A m1871
 
