@@ -44,6 +44,19 @@ def make_pos_array(del_bl,num_side):
 			ant_pos[ant_array[ii,jj]-1] = n.array([ii*del_bl,jj*del_bl,0.0])
 	return ant_pos
 
+def make_uhp_bls(del_bl,num_side):
+    """Assumes a squre num_side by num_side grid of antennas
+    and gives the unique baselines"""
+    bls = []
+    for j in range(num_side):
+        for i in range(-num_side+1,num_side):
+            if j == 0 and i <= 0:
+                continue
+            bls.append([float(i),float(j),0.])
+    bls = del_bl * n.array(bls)
+    return bls
+
+
 def get_aa(freqs):
 	'''Return the AntennaArray to be used for the simulation.'''
 	location = prms['loc']

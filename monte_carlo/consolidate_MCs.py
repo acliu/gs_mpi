@@ -11,8 +11,9 @@ beam_sig = float(sys.argv[4])
 lowerFreq = float(sys.argv[5])
 upperFreq = float(sys.argv[6])
 freqSpace = float(sys.argv[7])
-numMCs = int(sys.argv[8])
-saveInterval = int(sys.argv[9])
+variableBeam = int(sys.argv[8])
+numMCs = int(sys.argv[9])
+saveInterval = int(sys.argv[10])
 
 fqs = np.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
 fqs /= 1000. # Convert from MHz to GHz
@@ -22,7 +23,10 @@ numChunks = numMCs / saveInterval
 if numMCs%saveInterval != 0:
     numChunks += 1
 
-savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+if variableBeam == 0:
+    savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_fixedWidth_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+elif variableBeam == 1:
+    savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_lambdaBeam_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
 
 for i,freq in enumerate(fqs):
     fullMCs = None

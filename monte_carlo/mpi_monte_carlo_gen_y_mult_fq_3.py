@@ -3,6 +3,7 @@
 from mpi4py import MPI 
 import sys, os
 import numpy as n, aipy as a
+import basic_amp_aa_grid_gauss as agg
 
 def haslam_extrap(chunkLen,randos):
     """
@@ -60,24 +61,28 @@ nside = int(sys.argv[4])
 del_bl = float(sys.argv[5])
 sqGridSideLen = int(sys.argv[6])
 beam_sig = float(sys.argv[7])
-lowerFreq = float(sys.argv[8])
-upperFreq = float(sys.argv[9])
-freqSpace = float(sys.argv[10])
-numPerts = int(sys.argv[11])
-pertFile = sys.argv[12]
-numMCs = int(sys.argv[13])
-saveInterval = int(sys.argv[14])
-
+variableBeam = int(sys.argv[8])
+lowerFreq = float(sys.argv[9])
+upperFreq = float(sys.argv[10])
+freqSpace = float(sys.argv[11])
+numPerts = int(sys.argv[12])
+pertFile = sys.argv[13]
+numMCs = int(sys.argv[14])
+saveInterval = int(sys.argv[15])
 
 fqs = n.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
 fqs /= 1000. # Convert from MHz to GHz
 numFreqs = fqs.shape[0]
 npix = 12 * nside * nside
-numBl = sqGridSideLen * sqGridSideLen - 1
+baselines = agg.make_uhp_bls(del_bl,sqGridSideLen)
+numBl = len(baselines)
 
 # This code does not use del_bl, sqGridSideLen, or beam_sig for
 # anything other than filename definitions
-savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+if variableBeam == 0:
+    savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_fixedWidth_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
+elif variableBeam == 1:
+    savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_lambdaBeam_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
 Gmatrices = n.zeros((numFreqs,numBl,npix),dtype=complex)
 for i,freq in enumerate(fqs):
     tempMatrix = n.load('{0}/G_matrices/G_{1}_fq_{2:.3f}.npz'.format(Gmatrix_loc,savekey,freq))
@@ -171,4 +176,5 @@ elif rank<=numChunks:
             comm.send((rank,selectedChunkNum),dest=master)
             print "Slave ",rank," sent back i = ",selectedChunkNum
 comm.Barrier()
+MPI.Finalize()
 
