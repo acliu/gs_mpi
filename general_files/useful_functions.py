@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('agg')
 import pylab as plt 
 import numpy as np
 from scipy import optimize
