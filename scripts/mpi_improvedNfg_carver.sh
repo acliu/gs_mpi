@@ -30,7 +30,7 @@ numProcs=8
 
 module swap PrgEnv-pgi PrgEnv-gnu
 module load gcc
-module load openmpi
+module load openmpi-gcc
 module load python/2.7.3
 module load numpy
 module load matplotlib
@@ -39,6 +39,7 @@ module list
 #gfortran generate_Kfg.f90 -o generate_Kfg.x -O3
 #mpif90 generate_Kfg_mpi.f90 -o generate_Kfg_mpi.x -O3
 #ftn -O3 -ffast-math -funroll-loops -o generate_Kfg_mpi.x generate_Kfg_mpi.f90
+#mpif90 -O3 -ffast-math -funroll-loops -o mpi_generate_Kfg.x mpi_generate_Kfg.f90
 
 pushd $skyInfoDIR
 rm -f args.dat
