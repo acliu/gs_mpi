@@ -2,8 +2,8 @@
 #PBS -S /bin/bash
 #PBS -N mpi_improvedNfg_carver
 #PBS -j eo
-#PBS -l nodes=2:ppn=4,walltime=00:30:00,pvmem=5GB
-#PBS -q debug
+#PBS -l nodes=3:ppn=2,walltime=03:00:00,pvmem=10GB
+#PBS -q regular
 #PBS -A m1871
 
 codeLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi" #"/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi"
@@ -11,8 +11,8 @@ Gmatrix_codeLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/mon
 skyInfoDIR='/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/skyTemplates' #'/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/skyTemplates'
 ClFname="Cl_empirical.dat"
 templateFname="GSM_templateMap_70MHz_nside32.dat" #"template_small.dat"
-GmatrixLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data_test" #"/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/testingFiles"
-outputLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data_test" #"/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/testingFiles"
+GmatrixLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data_tests" #"/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/testingFiles"
+outputLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data_tests" #"/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/testingFiles"
 KfgFname="$outputLoc/Kfg.npy"
 nside=32 #8 #32
 nlmax=200
@@ -26,7 +26,7 @@ variableBeam=0
 # 0 is freq-independent primary beam
 # 1 is beam size proportional to wavelength, with beam_sig defined to be the size at 150 MHz
 
-numProcs=8
+numProcs=6
 
 module swap PrgEnv-pgi PrgEnv-gnu
 module load gcc
@@ -56,7 +56,7 @@ date
 #mpirun -np 7 generate_Kfg_mpi.x args.dat
 time mpirun -np $numProcs "$codeLoc/./mpi_generate_Kfg.x" args.dat
 time python "$codeLoc/raw2npy.py" Kfg.raw $KfgFname
-rm -f Kfg.raw
+#rm -f Kfg.raw
 date
 echo "...Done!"
 popd
