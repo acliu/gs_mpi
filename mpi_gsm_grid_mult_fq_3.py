@@ -53,7 +53,8 @@ sqGridSideLen = int(sys.argv[9])
 fqs = n.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
 fqs /= 1000. # Convert from MHz to GHz
 # Frequency-dependent beams
-beam_sig_fqs = beam_sig * 0.15 / fqs
+# beam_sig_fqs = beam_sig * 0.15 / fqs
+beam_sig_fqs = beam_sig + n.zeros_like(fqs)
 
 healmap = a.map.Map(fromfits=fits_file_loc)
 global px_array; px_array = n.arange(healmap.npix()) # gets an array of healpix pixel indices
