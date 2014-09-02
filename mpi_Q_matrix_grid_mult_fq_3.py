@@ -72,7 +72,6 @@ elif variableBeam == 1:
     savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_lambdaBeam_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
     beam_sig_fqs = beam_sig * 0.15 / fqs
 
-
 #im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
 #tx,ty,tz = im.get_top(center=(200,200)) 
 im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
