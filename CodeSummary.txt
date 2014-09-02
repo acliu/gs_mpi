@@ -30,6 +30,9 @@ gs_mpi/monte_carlo/mpi_monte_carlo_gen_y_mult_fq.py
 	> currently does NOT save the maps used to generate the visibilities
 	> imputs the number of mc runs to do and the interval between saves (note: it does NOT retain data after a save) as well as the grid parameters del_bl, num_bl, and beam_sig.
 
+gs_mpi/monte_carlo/mpi_monte_carlo_gen_y_mult_fq_3.py
+    > Adrian's version that uses a lot more memory but runs way quicker.
+
 gs_mpi/monte_carlo/run_files/make_many_sub_files_mc.py
 	> creates and submits a bunch of nersc jobs for mpi_monte_carlo_gen_y_mult_fq
 
