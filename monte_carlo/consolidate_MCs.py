@@ -29,26 +29,24 @@ elif variableBeam == 1:
     savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_lambdaBeam_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
 
 for i,freq in enumerate(fqs):
-    fullMCs = []
+    fullMCs = None
     for selectedChunkNum in range(numChunks):
         temp = np.load('{0}/{1}_fq_{2:.3f}/mc_{1}_chunk_{3}.npz'.format(mc_loc,savekey,freq,selectedChunkNum))
-        fullMCs.append(temp['matrix'])
-        #if fullMCs == None:
-        #    fullMCs = temp['matrix']
-        #else:
-        #    fullMCs = np.vstack((fullMCs,temp['matrix']))
-    fullMCs = np.vstack(fullMCs)
+        if fullMCs == None:
+            fullMCs = temp['matrix']
+        else:
+            fullMCs = np.vstack((fullMCs,temp['matrix']))
+        temp.close()
     np.savez_compressed('{0}/{1}_fq_{2:.3f}/mc_{1}_fq_{2:.3f}_allMCs'.format(mc_loc,savekey,freq),matrix=fullMCs)
 
-monopoleMCs = []
+monopoleMCs = None
 for selectedChunkNum in range(numChunks):
     temp = np.load('{0}/spatialMean_{1}_chunk_{2}.npy'.format(mc_loc,savekey,selectedChunkNum))
-    monopoleMCs.append(temp)
-    #if monopoleMCs == None:
-    #    monopoleMCs = temp
-    #else:
-    #    monopoleMCs = np.vstack((monopoleMCs,temp))
-monopoleMCs = np.vstack(monopoleMCs)
+    if monopoleMCs == None:
+        monopoleMCs = temp
+    else:
+        monopoleMCs = np.vstack((monopoleMCs,temp))
+    temp.close()
 
 ensembleAvMonopole = np.mean(monopoleMCs,axis=0)
 np.save('{0}/spatialMean_{1}_ensembleAv.npy'.format(mc_loc,savekey),ensembleAvMonopole)
