@@ -87,6 +87,7 @@ Gmatrices = n.zeros((numFreqs,numBl,npix),dtype=complex)
 for i,freq in enumerate(fqs):
     tempMatrix = n.load('{0}/G_matrices/G_{1}_fq_{2:.3f}.npz'.format(Gmatrix_loc,savekey,freq))
     Gmatrices[i] = tempMatrix['matrix'] # All processes read in the G matrices
+    tempMatrix.close()
 
 # Everyone reads in the Haslam map and forms the extrapolation to lower frequencies
 pertVar = n.loadtxt(pertFile) # First component of this is the unperturbed spectral index

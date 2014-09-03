@@ -1,9 +1,9 @@
 # !/bin/bash
 
 #PBS -S /bin/bash
-#PBS -N logFiles/mpi_monte_carlo_gen_y_fq_3_carver
+#PBS -N mpi_monte_carlo_gen_y_fq_3_carver
 #PBS -j eo
-#PBS -l nodes=3:ppn=4,walltime=00:30:00,pvmem=5GB
+#PBS -l nodes=3:ppn=8,walltime=00:30:00
 #PBS -q regular
 #PBS -A m1871
 
@@ -35,7 +35,7 @@ variableBeam=0
 
 numMCs=10000
 saveInterval=150
-numProcs=12
+numProcs=24
 
 module load python/2.7.3
 module load numpy
@@ -55,5 +55,10 @@ date
 echo "...Done! Now actually generating the Monte Carlos"
 date
 mpirun -np $numProcs python-mpi "$codeLoc/mpi_monte_carlo_gen_y_mult_fq_3.py" $outputLoc $templateLoc $GmatrixLoc $nside $del_bl $sqGridSideLen $beam_sig $variableBeam $lowerFreq $upperFreq $deltaFreq $numPertComponents $pertFile $numMCs $saveInterval
+date
+echo "...Done!"
+echo "Consolidating MC results"
+date
+python "$codeLoc/consolidate_MCs.py" $outputLoc $del_bl $sqGridSideLen $beam_sig $lowerFreq $upperFreq $deltaFreq $variableBeam $numMCs $saveInterval
 date
 echo "...all done!"
