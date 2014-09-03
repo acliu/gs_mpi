@@ -46,7 +46,6 @@ for selectedChunkNum in range(numChunks):
         monopoleMCs = temp
     else:
         monopoleMCs = np.vstack((monopoleMCs,temp))
-    temp.close()
 
 ensembleAvMonopole = np.mean(monopoleMCs,axis=0)
 np.save('{0}/spatialMean_{1}_ensembleAv.npy'.format(mc_loc,savekey),ensembleAvMonopole)
