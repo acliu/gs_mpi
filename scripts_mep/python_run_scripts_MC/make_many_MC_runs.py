@@ -5,12 +5,14 @@ import numpy as n
 beam_sigs = (n.pi/18,n.pi/6,5*n.pi/18,7*n.pi/18)
 sqGridSideLens = (4,8,12,16)
 variableBeams = (0,1)
+lowerFreq = 100. # in MHz
+lowerFreq /= 1000. # in GHz
 numMCs = 10000
 saveInterval = 150
 
 kk=0
 for beam_sig in beam_sigs:
-    del_bl = 1/(2*n.pi*beam_sig*0.1)
+    del_bl = 1/(2*n.pi*beam_sig*lowerFreq)
     print 'beam_sig = ',beam_sig,'; del_bl = ',del_bl
     for sqGridSideLen in sqGridSideLens:
         for variableBeam in variableBeams:
@@ -62,6 +64,11 @@ date
 echo "...Done! Now actually generating the Monte Carlos"
 date
 mpirun -np $numProcs python-mpi "$codeLoc/mpi_monte_carlo_gen_y_mult_fq_3.py" $outputLoc $templateLoc $GmatrixLoc $nside $del_bl $sqGridSideLen $beam_sig $variableBeam $lowerFreq $upperFreq $deltaFreq $numPertComponents $pertFile $numMCs $saveInterval
+date
+echo "...Done!"
+echo "Consolidating MC results"
+date
+python "$codeLoc/consolidate_MCs.py" $outputLoc $del_bl $sqGridSideLen $beam_sig $lowerFreq $upperFreq $deltaFreq $variableBeam $numMCs $saveInterval
 date
 echo "...all done!"
             
