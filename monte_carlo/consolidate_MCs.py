@@ -36,7 +36,8 @@ for i,freq in enumerate(fqs):
             fullMCs = temp['matrix']
         else:
             fullMCs = np.vstack((fullMCs,temp['matrix']))
-    np.savez_compressed('{0}/{1}_fq_{2:.3f}/mc_{1}_allMCs'.format(mc_loc,savekey,freq),matrix=fullMCs)
+        temp.close()
+    np.savez_compressed('{0}/{1}_fq_{2:.3f}/mc_{1}_fq_{2:.3f}_allMCs'.format(mc_loc,savekey,freq),matrix=fullMCs)
 
 monopoleMCs = None
 for selectedChunkNum in range(numChunks):
