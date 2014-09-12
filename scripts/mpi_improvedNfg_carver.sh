@@ -6,13 +6,18 @@
 #PBS -q regular
 #PBS -A m1871
 
+echo "********************************************************"
+echo "This is what I ran..."
+echo `cat $0`
+echo "********************************************************"
+
 codeLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi" #"/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi"
 Gmatrix_codeLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/monte_carlo" # "/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/monte_carlo"
 skyInfoDIR='/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/skyTemplates' #'/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/skyTemplates'
 ClFname="Cl_empirical.dat"
 templateFname="GSM_templateMap_70MHz_nside32.dat" #"template_small.dat"
-GmatrixLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data_tests" #"/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/testingFiles"
-outputLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data_tests" #"/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/testingFiles"
+GmatrixLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/fq_120_150_testCase" #"/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/testingFiles"
+outputLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/fq_120_150_testCase" #"/Users/Adrian/Research/GlobalSignalInterferometer/gs_mpi/testingFiles"
 KfgFname="$outputLoc/Kfg.npy"
 nside=32 #8 #32
 nlmax=200
