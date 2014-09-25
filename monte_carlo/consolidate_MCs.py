@@ -57,3 +57,26 @@ covariance /= float(numMCs)
 covariance -= np.outer(ensembleAvMonopole,ensembleAvMonopole)
 
 np.save('{0}/covariance_{1}.npy'.format(mc_loc,savekey),covariance)
+
+singleDipoleMCs = None
+for selectedChunkNum in range(numChunks):
+    temp = np.load('{0}/singleDipoleResult_{1}_chunk_{2}.npy'.format(mc_loc,savekey,selectedChunkNum))
+    if singleDipoleMCs == None:
+        singleDipoleMCs = temp
+    else:
+        singleDipoleMCs = np.vstack((singleDipoleMCs,temp))
+
+ensembleAvSingleDipole = np.mean(singleDipoleMCs,axis=0)
+np.save('{0}/singleDipoleMean_{1}_ensembleAv.npy'.format(mc_loc,savekey),ensembleAvSingleDipole)
+
+singleDipoleCovar = np.zeros((numFreqs,numFreqs))
+for realization in singleDipoleMCs:
+    singleDipoleCovar += np.outer(realization,realization)
+singleDipoleCovar /= float(numMCs)
+singleDipoleCovar -= np.outer(ensembleAvSingleDipole,ensembleAvSingleDipole)
+
+np.save('{0}/singleDipoleCovariance_{1}.npy'.format(mc_loc,savekey),singleDipoleCovar)
+
+
+
+
