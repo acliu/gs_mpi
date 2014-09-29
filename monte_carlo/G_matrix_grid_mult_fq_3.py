@@ -42,7 +42,8 @@ if __name__=='__main__':
     
     primaryBeam = np.zeros((fqs.shape[0],npix))
     for i,beamSize in enumerate(beam_sig_fqs):
-        primaryBeam[i,:] = uf.gaussian(beamSize,np.zeros(npix),directionVects_thetas)
+        #primaryBeam[i,:] = uf.gaussian(beamSize,np.zeros(npix),directionVects_thetas)
+        primaryBeam[i,:] = uf.cosine_gaussian(beamSize,directionVects_thetas)
 
     for k,freq in enumerate(fqs):
         print "Doing frequency number",k,"which is at",freq,"GHz"

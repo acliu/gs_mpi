@@ -116,7 +116,8 @@ elif variableBeam == 1:
    
 primaryBeam = n.zeros((fqs.shape[0],npix))
 for i,beamSize in enumerate(beam_sig_fqs):
-    primaryBeam[i,:] = uf.gaussian(beamSize,n.zeros(npix),directionVects_thetas)
+    #primaryBeam[i,:] = uf.gaussian(beamSize,n.zeros(npix),directionVects_thetas)
+    primaryBeam[i,:] = uf.cosine_gaussian(beamSize,directionVects_thetas)
 
 integratedBeams = n.sum(primaryBeam,axis=1)
 

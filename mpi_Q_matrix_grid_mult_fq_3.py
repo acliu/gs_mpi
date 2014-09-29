@@ -83,7 +83,8 @@ theta = n.arctan2(ty,tx) # using math convention of theta=[0,2pi], phi=[0,pi]
 phi = n.arccos(n.sqrt(1-tx*tx-ty*ty))
 amp = n.zeros((fqs.shape[0],tx.shape[0]))
 for i,beamSize in enumerate(beam_sig_fqs):
-    amp[i,:] = uf.gaussian(beamSize,n.zeros_like(theta),phi)
+    #amp[i,:] = uf.gaussian(beamSize,n.zeros_like(theta),phi)
+    amp[i,:] = uf.cosine_gaussian(beamSize,phi)
 
 
 # Make square grid of baselines with u=v=0 missing

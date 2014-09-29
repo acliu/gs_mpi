@@ -72,7 +72,8 @@ phi,theta = n.array(healmap.px2crd(px_array,ncrd=2))
 
 amp = n.zeros((fqs.shape[0],len(phi)))
 for i,beamSize in enumerate(beam_sig_fqs):
-    amp[i,:] = uf.gaussian(beamSize,n.zeros_like(theta),phi)
+    #amp[i,:] = uf.gaussian(beamSize,n.zeros_like(theta),phi)
+    amp[i,:] = uf.cosine_gaussian(beamSize,phi)
 #baselines = agg.make_pos_array(del_bl,sqGridSideLen)
 baselines = agg.make_uhp_bls(del_bl,sqGridSideLen)
 
