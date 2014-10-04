@@ -100,7 +100,7 @@ elif variableBeam == 1:
 Gmatrices = n.zeros((numFreqs,numBl,npix),dtype=complex)
 for i,freq in enumerate(fqs):
     tempMatrix = n.load('{0}/G_matrices/G_{1}_fq_{2:.3f}.npz'.format(Gmatrix_loc,savekey,freq))
-    Gmatrices[i] = tempMatrix['matrix'] # All processes read in the G matrices
+    Gmatrices[i] = tempMatrix['matrix'].copy() # All processes read in the G matrices
     tempMatrix.close()
 
 # Create primary beams for everyone to use
