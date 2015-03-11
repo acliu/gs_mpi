@@ -55,7 +55,7 @@ save_loc = sys.argv[1]
 
 # define parameters related to calculation 
 maxl = int(sys.argv[2])
-beam_sig = float(sys.argv[3]) # primary beam standard deviation at 150 MHz
+beam_sig = float(sys.argv[3]) # primary beam standard deviation at lowest frequency
 del_bl = float(sys.argv[4])
 sqGridSideLen = int(sys.argv[5])
 lowerFreq = float(sys.argv[6])
@@ -70,7 +70,8 @@ if variableBeam == 0:
     beam_sig_fqs = beam_sig * n.ones_like(fqs)
 elif variableBeam == 1:
     savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_lambdaBeam_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
-    beam_sig_fqs = beam_sig * 0.15 / fqs
+    #beam_sig_fqs = beam_sig * 0.15 / fqs
+    beam_sig_fqs = beam_sig * fqs[0] / fqs
 
 #im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
 #tx,ty,tz = im.get_top(center=(200,200)) 
