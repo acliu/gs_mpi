@@ -3,6 +3,7 @@
 from mpi4py import MPI 
 import sys, os
 import numpy as n, aipy as a
+import useful_functions as uf
 import basic_amp_aa_grid_gauss as agg
 
 def haslam_extrap(chunkLen,randos):
@@ -38,6 +39,19 @@ def extractSampleSkies(chunkNum,simSkies):
     
     monopoleSky = n.sum(simSkies,axis=2) / float(npix) # MCs x freqs
     n.save('{0}/spatialMean_{1}_chunk_{2}.npy'.format(mc_loc,savekey,chunkNum),monopoleSky)
+    return None
+
+def simulateSingleDipole(chunkNum,simSkies):
+    localNumMCs = simSkies.shape[0]
+    numFreqs = simSkies.shape[1]
+    singleDipoleResult = n.zeros((localNumMCs,numFreqs))
+    for i,sky in enumerate(simSkies):
+        for j,(beam,sk) in enumerate(zip(primaryBeam,sky)):
+            singleDipoleResult[i,j] = n.dot(beam,sk) # MCs x freqs
+    for i in range(localNumMCs):
+        singleDipoleResult[i] /= integratedBeams
+
+    n.save('{0}/singleDipoleResult_{1}_chunk_{2}.npy'.format(mc_loc,savekey,chunkNum),singleDipoleResult)
     return None
 
 def simulate_measurement(chunkLen,simSkies):
@@ -86,8 +100,30 @@ elif variableBeam == 1:
 Gmatrices = n.zeros((numFreqs,numBl,npix),dtype=complex)
 for i,freq in enumerate(fqs):
     tempMatrix = n.load('{0}/G_matrices/G_{1}_fq_{2:.3f}.npz'.format(Gmatrix_loc,savekey,freq))
-    Gmatrices[i] = tempMatrix['matrix'] # All processes read in the G matrices
+    Gmatrices[i] = tempMatrix['matrix'].copy() # All processes read in the G matrices
     tempMatrix.close()
+
+# Create primary beams for everyone to use
+beamMap = a.map.Map(nside)
+directionVects_xyz = beamMap.map.px2crd(n.array([i for i in range(npix)]))
+directionVects_xyz = n.array(directionVects_xyz).T
+directionVects_thetas = beamMap.map.px2crd(n.array([i for i in range(npix)]),ncrd=2)[0]
+    
+if variableBeam == 0:
+    beam_sig_fqs = beam_sig * n.ones_like(fqs)
+elif variableBeam == 1:
+    beam_sig_fqs = beam_sig * 0.15 / fqs
+   
+primaryBeam = n.zeros((fqs.shape[0],npix))
+for i,beamSize in enumerate(beam_sig_fqs):
+    #primaryBeam[i,:] = uf.gaussian(beamSize,n.zeros(npix),directionVects_thetas)
+    primaryBeam[i,:] = uf.cosine_gaussian(beamSize,directionVects_thetas)
+
+integratedBeams = n.sum(primaryBeam,axis=1)
+
+
+
+
 
 # Everyone reads in the Haslam map and forms the extrapolation to lower frequencies
 pertVar = n.loadtxt(pertFile) # First component of this is the unperturbed spectral index
@@ -169,6 +205,7 @@ elif rank<=numChunks:
             randNums = randNums.reshape((chunkLen,numPerts,npix))
             simSkies = haslam_extrap(chunkLen,randNums)
             extractSampleSkies(selectedChunkNum,simSkies)
+            simulateSingleDipole(selectedChunkNum,simSkies)
             simulated_yVects = simulate_measurement(chunkLen,simSkies)
             for i,freq in enumerate(fqs):
                 n.savez_compressed('{0}/{1}_fq_{2:.3f}/mc_{1}_chunk_{3}'.\
