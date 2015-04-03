@@ -112,7 +112,9 @@ directionVects_thetas = beamMap.map.px2crd(n.array([i for i in range(npix)]),ncr
 if variableBeam == 0:
     beam_sig_fqs = beam_sig * n.ones_like(fqs)
 elif variableBeam == 1:
-    beam_sig_fqs = beam_sig * 0.15 / fqs
+    #beam_sig_fqs = beam_sig * 0.15 / fqs
+    beam_sig_fqs = beam_sig * fqs[0] / fqs
+
    
 primaryBeam = n.zeros((fqs.shape[0],npix))
 for i,beamSize in enumerate(beam_sig_fqs):

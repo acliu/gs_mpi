@@ -14,12 +14,12 @@ outputLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data"
 numProcs=72
 maxl=7
 beam_sig=1.57 
-del_bl=0.844 
-sqGridSideLen=12
+del_bl=6.67  
+sqGridSideLen=5
 lowerFreq=120 # in MHz
 upperFreq=150 # in MHz
 deltaFreq=1 # in MHz
-variableBeam=0
+variableBeam=1
 # 0 is freq-independent primary beam
 # 1 is beam size proportional to wavelength, with beam_sig defined to be the size at 150 MHz
 

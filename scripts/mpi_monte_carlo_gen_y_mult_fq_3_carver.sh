@@ -3,15 +3,18 @@
 #PBS -S /bin/bash
 #PBS -N mpi_monte_carlo_gen_y_fq_3_carver
 #PBS -j eo
-#PBS -l nodes=3:ppn=4,walltime=00:30:00,pvmem=5GB
+#PBS -l nodes=3:ppn=4,walltime=00:45:00,pvmem=5GB
 #PBS -q regular
 #PBS -A m1871
 
 
 codeLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/monte_carlo"
-outputLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data/MCs"
-templateLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/skyTemplates/haslam_408MHz_nside32.fits"
-GmatrixLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data"
+#outputLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data/MCs"
+outputLoc="/global/homes/a/acliu/globalSig/fq_120_150_testCase/MCs"
+#templateLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/skyTemplates/haslam_408MHz_nside32.fits"
+templateLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/skyTemplates/gsm_haslam_32.fits"
+#GmatrixLoc="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_data"
+GmatrixLoc="/global/homes/a/acliu/globalSig/fq_120_150_testCase"
 pertFile="/global/scratch2/sd/acliu/GlobalSignalInterferometer/gs_mpi/skyTemplates/perturbationVariances.dat"
 nside=32
 beam_sig=1.57 

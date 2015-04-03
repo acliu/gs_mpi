@@ -58,7 +58,8 @@ if variableBeam == 0:
     beam_sig_fqs = beam_sig * n.ones_like(fqs)
 elif variableBeam == 1:
     savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_lambdaBeam_beam_sig_{2:.2f}'.format(del_bl,sqGridSideLen,beam_sig)
-    beam_sig_fqs = beam_sig * 0.15 / fqs
+    #beam_sig_fqs = beam_sig * 0.15 / fqs
+    beam_sig_fqs = beam_sig * fqs[0] / fqs
 
 healmap = a.map.Map(fromfits=fits_file_loc)
 global px_array; px_array = n.arange(healmap.npix()) # gets an array of healpix pixel indices
