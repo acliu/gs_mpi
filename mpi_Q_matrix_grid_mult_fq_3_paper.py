@@ -63,6 +63,8 @@ freqSpace = float(sys.argv[7])
 fqs = n.arange(lowerFreq,upperFreq+freqSpace,freqSpace)
 fqs /= 1000. # Convert from MHz to GHz
 
+savekey = 'grid_del_bl_{0:.2f}_sqGridSideLen_{1}_PAPER_beam'.format(del_bl,sqGridSideLen)
+
 #im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
 #tx,ty,tz = im.get_top(center=(200,200)) 
 im = a.img.Img(size=200, res=.5) #make an image of the sky to get sky coords
